@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stork — Battle of the Bands</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <style>
+        .song-section { margin-bottom: 2rem; }
+        .result-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .result-item {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .result-item.slash { background: #f39c12; color: white; }
+        .result-item.hendrix { background: #8e44ad; color: white; }
+        .result-item.eddie { background: #e74c3c; color: white; }
+        .result-item.fail { background: #95a5a6; color: white; }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title is-1">Stork — Battle of the Bands</h1>
+        <p class="subtitle">SmallRye Stork: Service Discovery & Client-Side Load Balancing</p>
+
+        <!-- Song 1: Plug & Play -->
+        <div class="song-section box">
+            <h2 class="title is-3">Song 1 — Plug & Play</h2>
+            <p class="subtitle is-5">Auto-registration with Consul</p>
+            <p>Guitarist services auto-register when they start. Watch them appear!</p>
+            <button class="button is-primary" onclick="callService('quarkus', 10, 'song1-results')">
+                Play 10 notes (Quarkus)
+            </button>
+            <button class="button is-light" onclick="clearResults('song1-results')">Clear</button>
+            <div id="song1-results" class="result-grid"></div>
+        </div>
+
+        <!-- Song 2: Battle of Strategies -->
+        <div class="song-section box">
+            <h2 class="title is-3">Song 2 — Battle of Strategies</h2>
+            <p class="subtitle is-5">Live Load Balancing comparison</p>
+            <div class="buttons">
+                <button class="button is-info" onclick="callService('quarkus', 20, 'song2-results')">
+                    Fire 20 calls
+                </button>
+                <button class="button is-light" onclick="clearResults('song2-results')">Clear</button>
+            </div>
+            <div id="song2-results" class="result-grid"></div>
+        </div>
+
+        <!-- Song 3: Two Stages, One Band -->
+        <div class="song-section box">
+            <h2 class="title is-3">Song 3 — Two Stages, One Band</h2>
+            <p class="subtitle is-5">Quarkus vs Spring Boot — same Stork, same band</p>
+            <button class="button is-success" onclick="callBoth(10)">
+                Play 10 notes on both stages
+            </button>
+            <button class="button is-light" onclick="clearResults('song3-quarkus'); clearResults('song3-spring')">Clear</button>
+            <div class="two-columns">
+                <div>
+                    <h4 class="title is-5">Quarkus Stage</h4>
+                    <div id="song3-quarkus" class="result-grid"></div>
+                </div>
+                <div>
+                    <h4 class="title is-5">Spring Boot Stage</h4>
+                    <div id="song3-spring" class="result-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Song 4: The Encore -->
+        <div class="song-section box">
+            <h2 class="title is-3">Song 4 — The Encore</h2>
+            <p class="subtitle is-5">Observability — Metrics & Monitoring</p>
+            <p>TODO: Embedded metrics panel (Prometheus / Grafana)</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    function callService(dispatcher, count, targetId) {
+        const target = document.getElementById(targetId);
+        for (let i = 0; i < count; i++) {
+            fetch('/call/' + dispatcher)
+                .then(r => r.text())
+                .then(name => {
+                    const el = document.createElement('span');
+                    el.className = 'result-item ' + name.toLowerCase();
+                    el.textContent = name;
+                    target.appendChild(el);
+                })
+                .catch(() => {
+                    const el = document.createElement('span');
+                    el.className = 'result-item fail';
+                    el.textContent = 'FAIL';
+                    target.appendChild(el);
+                });
+        }
+    }
+
+    function callBoth(count) {
+        callService('quarkus', count, 'song3-quarkus');
+        callService('spring', count, 'song3-spring');
+    }
+
+    function clearResults(targetId) {
+        document.getElementById(targetId).innerHTML = '';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+services:
+
+  consul:
+    image: hashicorp/consul:1.20
+    ports:
+      - "8500:8500"
+    command: agent -dev -client=0.0.0.0
+
+  slash:
+    build: guitarist-service
+    ports:
+      - "9000:9000"
+    environment:
+      GUITARIST_NAME: Slash
+      GUITARIST_PORT: 9000
+      GUITARIST_DELAY_MS: 300
+      GUITARIST_FAILURE_RATIO: 0
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+    depends_on:
+      - consul
+
+  hendrix:
+    build: guitarist-service
+    ports:
+      - "9001:9001"
+    environment:
+      GUITARIST_NAME: Hendrix
+      GUITARIST_PORT: 9001
+      GUITARIST_DELAY_MS: 500
+      GUITARIST_FAILURE_RATIO: 0
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+    depends_on:
+      - consul
+
+  eddie:
+    build: guitarist-service
+    ports:
+      - "9002:9002"
+    environment:
+      GUITARIST_NAME: Eddie
+      GUITARIST_PORT: 9002
+      GUITARIST_DELAY_MS: 5
+      GUITARIST_FAILURE_RATIO: 20
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+    depends_on:
+      - consul
+
+  dispatcher-quarkus:
+    build: dispatcher-quarkus
+    ports:
+      - "8080:8080"
+    environment:
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+    depends_on:
+      - consul
+      - slash
+      - hendrix
+      - eddie
+
+  dispatcher-spring:
+    build: dispatcher-spring
+    ports:
+      - "8081:8081"
+    environment:
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+    depends_on:
+      - consul
+      - slash
+      - hendrix
+      - eddie
+
+  ui:
+    build: ui
+    ports:
+      - "8082:8082"
+    environment:
+      DISPATCHER_QUARKUS_HOST: dispatcher-quarkus
+      DISPATCHER_QUARKUS_PORT: 8080
+      DISPATCHER_SPRING_HOST: dispatcher-spring
+      DISPATCHER_SPRING_PORT: 8081
+    depends_on:
+      - dispatcher-quarkus
+      - dispatcher-spring
