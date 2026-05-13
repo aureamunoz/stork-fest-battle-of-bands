@@ -114,7 +114,7 @@ The current demo (`stork-guitar-hero-demo`) is a single Quarkus module with:
 
 ```
 stork-battle-of-bands-demo/
-├── guitarist-service/          # Generic parameterizable service (Quarkus, auto-registers in Consul)
+├── guitar-hero-service/          # Generic parameterizable service (Quarkus, auto-registers in Consul)
 ├── dispatcher-quarkus/         # Quarkus dispatcher with Stork
 ├── dispatcher-spring/          # Spring Boot dispatcher with Stork
 ├── ui/                         # Frontend (can live in dispatcher-quarkus)

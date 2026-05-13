@@ -11,7 +11,7 @@
     <name>Stork Battle of the Bands Demo</name>
 
     <modules>
-        <module>guitarist-service</module>
+        <module>guitar-hero-service</module>
         <module>dispatcher-quarkus</module>
         <module>dispatcher-spring</module>
         <module>ui</module>

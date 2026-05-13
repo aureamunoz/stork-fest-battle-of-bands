@@ -11,15 +11,15 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.util.Random;
 
 @Path("/")
-public class GuitaristResource {
+public class GuitarHeroResource {
 
-    @ConfigProperty(name = "guitarist.name", defaultValue = "Slash")
+    @ConfigProperty(name = "guitar-hero.name", defaultValue = "Slash")
     String name;
 
-    @ConfigProperty(name = "guitarist.delay-ms", defaultValue = "300")
+    @ConfigProperty(name = "guitar-hero.delay-ms", defaultValue = "300")
     int delayMs;
 
-    @ConfigProperty(name = "guitarist.failure-ratio", defaultValue = "0")
+    @ConfigProperty(name = "guitar-hero.failure-ratio", defaultValue = "0")
     int failureRatio;
 
     private final Random random = new Random();

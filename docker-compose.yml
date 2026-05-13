@@ -7,42 +7,42 @@ services:
     command: agent -dev -client=0.0.0.0
 
   slash:
-    build: guitarist-service
+    build: guitar-hero-service
     ports:
       - "9000:9000"
     environment:
-      GUITARIST_NAME: Slash
-      GUITARIST_PORT: 9000
-      GUITARIST_DELAY_MS: 300
-      GUITARIST_FAILURE_RATIO: 0
+      GUITAR_HERO_NAME: Slash
+      GUITAR_HERO_PORT: 9000
+      GUITAR_HERO_DELAY_MS: 300
+      GUITAR_HERO_FAILURE_RATIO: 0
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
     depends_on:
       - consul
 
   hendrix:
-    build: guitarist-service
+    build: guitar-hero-service
     ports:
       - "9001:9001"
     environment:
-      GUITARIST_NAME: Hendrix
-      GUITARIST_PORT: 9001
-      GUITARIST_DELAY_MS: 500
-      GUITARIST_FAILURE_RATIO: 0
+      GUITAR_HERO_NAME: Hendrix
+      GUITAR_HERO_PORT: 9001
+      GUITAR_HERO_DELAY_MS: 500
+      GUITAR_HERO_FAILURE_RATIO: 0
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
     depends_on:
       - consul
 
   eddie:
-    build: guitarist-service
+    build: guitar-hero-service
     ports:
       - "9002:9002"
     environment:
-      GUITARIST_NAME: Eddie
-      GUITARIST_PORT: 9002
-      GUITARIST_DELAY_MS: 5
-      GUITARIST_FAILURE_RATIO: 20
+      GUITAR_HERO_NAME: Eddie
+      GUITAR_HERO_PORT: 9002
+      GUITAR_HERO_DELAY_MS: 5
+      GUITAR_HERO_FAILURE_RATIO: 20
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
     depends_on:
