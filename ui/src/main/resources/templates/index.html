@@ -61,34 +61,53 @@
         <h1 class="title is-1">Stork — Battle of the Bands</h1>
         <p class="subtitle">SmallRye Stork: Service Discovery & Client-Side Load Balancing</p>
 
-        <!-- Song 1: Plug & Play -->
+        <!-- Song 1: Plug & Play — Auto-registration -->
         <div class="song-section box">
             <h2 class="title is-3">Song 1 — Plug & Play</h2>
             <p class="subtitle is-5">Auto-registration with Consul</p>
             <p>Guitarist services auto-register when they start. Watch them appear!</p>
 
-            <div class="columns mt-4">
-                <div class="column is-half">
-                    <h4 class="title is-5">Registered Services</h4>
-                    <div id="registered-services">
-                        <p class="has-text-grey-light">Waiting for services...</p>
-                    </div>
-                </div>
-                <div class="column is-half">
-                    <div class="buttons">
-                        <button class="button is-primary" onclick="callService('quarkus', 10, 'song1-results')">
-                            Play 10 notes
-                        </button>
-                        <button class="button is-light" onclick="clearResults('song1-results')">Clear</button>
-                    </div>
-                    <div id="song1-results" class="result-grid"></div>
+            <div class="mt-4">
+                <h4 class="title is-5">Registered Services</h4>
+                <div id="registered-services">
+                    <p class="has-text-grey-light">Waiting for services...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Song 2: Battle of Strategies -->
+        <!-- Song 2: Service Discovery + Caching -->
         <div class="song-section box">
-            <h2 class="title is-3">Song 2 — Battle of Strategies</h2>
+            <h2 class="title is-3">Song 2 — Service Discovery</h2>
+            <p class="subtitle is-5">Consul discovery with instance caching</p>
+            <p>Stork discovers instances from Consul and <strong>caches</strong> them to avoid calling the registry on every request.
+               The cache refreshes periodically (<code>refresh-period</code>).</p>
+
+            <div class="columns mt-4">
+                <div class="column is-half">
+                    <div class="buttons">
+                        <button class="button is-primary" onclick="callService('quarkus', 10, 'song1b-results')">
+                            Play 10 notes (round-robin)
+                        </button>
+                        <button class="button is-light" onclick="clearResults('song1b-results')">Clear</button>
+                    </div>
+                    <div id="song1b-results" class="result-grid"></div>
+                </div>
+                <div class="column is-half">
+                    <div class="notification is-info is-light">
+                        <p class="is-size-7"><strong>How caching works:</strong></p>
+                        <p class="is-size-7">On the first call, Stork fetches the instance list from Consul and caches it.
+                           Subsequent calls use the cache — no extra network round-trip to Consul.
+                           The cache is refreshed every <code>refresh-period</code> (default: 5 min).</p>
+                        <p class="is-size-7 mt-2"><strong>Try it:</strong> Start a new guitarist while this is running.
+                           It won't appear immediately — only after the cache refreshes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Song 3: Battle of Strategies -->
+        <div class="song-section box">
+            <h2 class="title is-3">Song 3 — Battle of Strategies</h2>
             <p class="subtitle is-5">Live Load Balancing comparison</p>
             <div class="buttons">
                 <button class="button is-info" onclick="callService('quarkus', 20, 'song2-results')">
@@ -99,9 +118,9 @@
             <div id="song2-results" class="result-grid"></div>
         </div>
 
-        <!-- Song 3: Two Stages, One Band -->
+        <!-- Song 4: Two Stages, One Band -->
         <div class="song-section box">
-            <h2 class="title is-3">Song 3 — Two Stages, One Band</h2>
+            <h2 class="title is-3">Song 4 — Two Stages, One Band</h2>
             <p class="subtitle is-5">Quarkus vs Spring Boot — same Stork, same band</p>
             <button class="button is-success" onclick="callBoth(10)">
                 Play 10 notes on both stages
@@ -119,9 +138,9 @@
             </div>
         </div>
 
-        <!-- Song 4: The Encore -->
+        <!-- Song 5: The Encore -->
         <div class="song-section box">
-            <h2 class="title is-3">Song 4 — The Encore</h2>
+            <h2 class="title is-3">Song 5 — The Encore</h2>
             <p class="subtitle is-5">Observability — Metrics & Monitoring</p>
             <p>TODO: Embedded metrics panel (Prometheus / Grafana)</p>
         </div>
@@ -174,6 +193,12 @@
         'eddie': 'EddieVanHalen.jpg'
     };
 
+    const portToGuitarist = {
+        9000: 'slash',
+        9001: 'hendrix',
+        9002: 'eddie'
+    };
+
     let knownServices = new Set();
 
     function pollConsulServices() {
@@ -199,16 +224,16 @@
                     dot.className = 'status-dot';
                     card.appendChild(dot);
 
-                    const name = svc.ServiceID || svc.ServiceName || 'unknown';
-                    const imgKey = Object.keys(guitaristImages).find(k => name.toLowerCase().includes(k));
-                    if (imgKey) {
+                    const guitarist = portToGuitarist[svc.ServicePort];
+                    if (guitarist && guitaristImages[guitarist]) {
                         const img = document.createElement('img');
-                        img.src = '/' + guitaristImages[imgKey];
+                        img.src = '/' + guitaristImages[guitarist];
                         card.appendChild(img);
                     }
 
                     const label = document.createElement('span');
-                    label.textContent = name + ' (' + svc.ServiceAddress + ':' + svc.ServicePort + ')';
+                    const displayName = guitarist ? guitarist.charAt(0).toUpperCase() + guitarist.slice(1) : 'unknown';
+                    label.textContent = displayName + ' (' + svc.ServiceAddress + ':' + svc.ServicePort + ')';
                     card.appendChild(label);
 
                     container.appendChild(card);
