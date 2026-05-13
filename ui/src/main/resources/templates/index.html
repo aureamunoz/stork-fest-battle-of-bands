@@ -4,10 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stork — Battle of the Bands</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <link rel="stylesheet" href="/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="/reveal.js/dist/theme/black-contrast.css">
+    <link rel="stylesheet" href="/reveal.js/plugin/highlight/monokai.css">
     <style>
-        .song-section { margin-bottom: 2rem; }
-        .result-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-transform: none;
+        }
+        .reveal pre {
+            width: 95%;
+            font-size: 0.45em;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .reveal pre code {
+            padding: 1em;
+            max-height: 500px;
+        }
+        .reveal ul { font-size: 0.85em; }
+        .reveal li { margin-bottom: 0.4em; }
+        .reveal section { text-align: left; }
+        .reveal section h1, .reveal section h2, .reveal section h3, .reveal section p {
+            text-align: center;
+        }
+        .highlight-yellow { color: #eee600; font-weight: bold; }
+        .highlight-green { color: #2ecc71; font-weight: bold; }
+        .highlight-blue { color: #3498db; font-weight: bold; }
+        .demo-label {
+            background: #e74c3c;
+            color: white;
+            padding: 0.1em 0.5em;
+            border-radius: 4px;
+            font-size: 0.7em;
+            vertical-align: middle;
+        }
+
+        /* Demo interactive elements */
+        .demo-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .result-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            min-height: 70px;
+        }
         .result-item {
             display: inline-flex;
             flex-direction: column;
@@ -15,10 +59,10 @@
             padding: 0.4rem;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.5rem;
         }
         .result-item img {
-            width: 56px; height: 56px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid transparent;
@@ -26,16 +70,14 @@
         .result-item.slash img { border-color: #f39c12; }
         .result-item.hendrix img { border-color: #8e44ad; }
         .result-item.eddie img { border-color: #e74c3c; }
-        .result-item.fail { background: #95a5a6; color: white; padding: 0.5rem 1rem; border-radius: 4px; }
-        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-
+        .result-item.fail img { border-color: transparent; }
         .service-card {
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1.25rem;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
-            background: #f5f5f5;
+            background: rgba(255,255,255,0.1);
             margin: 0.25rem;
             animation: fadeIn 0.4s ease-in;
         }
@@ -45,7 +87,8 @@
             background: #48c774;
         }
         .service-card img {
-            width: 48px; height: 48px;
+            width: 40px; height: 40px;
+            min-width: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
@@ -53,101 +96,327 @@
             from { opacity: 0; transform: translateY(8px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+        .demo-btn {
+            display: inline-block;
+            padding: 0.5em 1.2em;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.6em;
+            font-weight: bold;
+            margin: 0.2em;
+        }
+        .demo-btn-primary { background: #3273dc; color: white; }
+        .demo-btn-light { background: rgba(255,255,255,0.15); color: white; }
+        .demo-btn:hover { opacity: 0.85; }
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .info-box {
+            background: rgba(50,115,220,0.15);
+            border-left: 4px solid #3273dc;
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.55em;
+        }
+        /* Demo slides: content starts at the top */
+        .reveal .slides section.demo-slide {
+            top: 0 !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 1em;
+        }
+        /* Service cards row */
+        #registered-services {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+        }
+        .service-card {
+            flex: 1 1 0;
+            min-width: 0;
+            justify-content: center;
+        }
+        /* Floating services overlay */
+        .services-fab {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 100;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: #3273dc;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .services-fab:hover { opacity: 0.85; }
+        .services-overlay {
+            display: none;
+            position: fixed;
+            bottom: 4rem;
+            left: 1rem;
+            z-index: 99;
+            background: rgba(30,30,30,0.95);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            min-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .services-overlay.open { display: block; }
+        .services-overlay h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.7);
+        }
     </style>
 </head>
 <body>
-<section class="section">
-    <div class="container">
-        <h1 class="title is-1">Stork — Battle of the Bands</h1>
-        <p class="subtitle">SmallRye Stork: Service Discovery & Client-Side Load Balancing</p>
 
-        <!-- Song 1: Plug & Play — Auto-registration -->
-        <div class="song-section box">
-            <h2 class="title is-3">Song 1 — Plug & Play</h2>
-            <p class="subtitle is-5">Auto-registration with Consul</p>
-            <p>Guitarist services auto-register when they start. Watch them appear!</p>
-
-            <div class="mt-4">
-                <h4 class="title is-5">Registered Services</h4>
-                <div id="registered-services">
-                    <p class="has-text-grey-light">Waiting for services...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Song 2: Service Discovery + Caching -->
-        <div class="song-section box">
-            <h2 class="title is-3">Song 2 — Service Discovery</h2>
-            <p class="subtitle is-5">Consul discovery with instance caching</p>
-            <p>Stork discovers instances from Consul and <strong>caches</strong> them to avoid calling the registry on every request.
-               The cache refreshes periodically (<code>refresh-period</code>).</p>
-
-            <div class="columns mt-4">
-                <div class="column is-half">
-                    <div class="buttons">
-                        <button class="button is-primary" onclick="callService('quarkus', 10, 'song1b-results')">
-                            Play 10 notes (round-robin)
-                        </button>
-                        <button class="button is-light" onclick="clearResults('song1b-results')">Clear</button>
-                    </div>
-                    <div id="song1b-results" class="result-grid"></div>
-                </div>
-                <div class="column is-half">
-                    <div class="notification is-info is-light">
-                        <p class="is-size-7"><strong>How caching works:</strong></p>
-                        <p class="is-size-7">On the first call, Stork fetches the instance list from Consul and caches it.
-                           Subsequent calls use the cache — no extra network round-trip to Consul.
-                           The cache is refreshed every <code>refresh-period</code> (default: 5 min).</p>
-                        <p class="is-size-7 mt-2"><strong>Try it:</strong> Start a new guitarist while this is running.
-                           It won't appear immediately — only after the cache refreshes.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Song 3: Battle of Strategies -->
-        <div class="song-section box">
-            <h2 class="title is-3">Song 3 — Battle of Strategies</h2>
-            <p class="subtitle is-5">Live Load Balancing comparison</p>
-            <div class="buttons">
-                <button class="button is-info" onclick="callService('quarkus', 20, 'song2-results')">
-                    Fire 20 calls
-                </button>
-                <button class="button is-light" onclick="clearResults('song2-results')">Clear</button>
-            </div>
-            <div id="song2-results" class="result-grid"></div>
-        </div>
-
-        <!-- Song 4: Two Stages, One Band -->
-        <div class="song-section box">
-            <h2 class="title is-3">Song 4 — Two Stages, One Band</h2>
-            <p class="subtitle is-5">Quarkus vs Spring Boot — same Stork, same band</p>
-            <button class="button is-success" onclick="callBoth(10)">
-                Play 10 notes on both stages
-            </button>
-            <button class="button is-light" onclick="clearResults('song3-quarkus'); clearResults('song3-spring')">Clear</button>
-            <div class="two-columns">
-                <div>
-                    <h4 class="title is-5">Quarkus Stage</h4>
-                    <div id="song3-quarkus" class="result-grid"></div>
-                </div>
-                <div>
-                    <h4 class="title is-5">Spring Boot Stage</h4>
-                    <div id="song3-spring" class="result-grid"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Song 5: The Encore -->
-        <div class="song-section box">
-            <h2 class="title is-3">Song 5 — The Encore</h2>
-            <p class="subtitle is-5">Observability — Metrics & Monitoring</p>
-            <p>TODO: Embedded metrics panel (Prometheus / Grafana)</p>
-        </div>
+<!-- Floating services button + overlay -->
+<button class="services-fab" onclick="toggleServicesOverlay()" title="Registered Services">🎸</button>
+<div class="services-overlay" id="services-overlay">
+    <h4>Registered Services</h4>
+    <div id="overlay-services">
+        <span style="color:rgba(255,255,255,0.3); font-size:0.6rem;">No services</span>
     </div>
-</section>
+</div>
 
+<div class="reveal">
+    <div class="slides">
+
+        <!-- ============== TITLE ============== -->
+        <section>
+            <h1>Stork</h1>
+            <h2>Battle of the Bands</h2>
+            <p>SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
+            <p style="font-size: 0.6em; margin-top: 2em;">Aurea Munoz — 2026</p>
+        </section>
+
+        <!-- ============== AGENDA ============== -->
+        <section>
+            <h2>Setlist</h2>
+            <ul>
+                <li><span class="highlight-yellow">Song 1</span> — Plug &amp; Play <span style="font-size:0.7em">(Auto-registration)</span></li>
+                <li><span class="highlight-green">Song 2</span> — Service Discovery <span style="font-size:0.7em">(Discovery + Caching)</span></li>
+                <li><span class="highlight-blue">Song 3</span> — Battle of Strategies <span style="font-size:0.7em">(Load Balancing)</span></li>
+                <li><span class="highlight-yellow">Song 4</span> — Two Stages, One Band <span style="font-size:0.7em">(Quarkus + Spring Boot)</span></li>
+                <li><span class="highlight-green">Song 5</span> — The Encore <span style="font-size:0.7em">(Observability)</span></li>
+            </ul>
+        </section>
+
+        <!-- ============== SONG 1: PLUG & PLAY ============== -->
+        <section>
+            <!-- Explanation slide -->
+            <section>
+                <h2><span class="highlight-yellow">Song 1</span> — Plug &amp; Play</h2>
+                <h3>Auto-registration with Consul</h3>
+                <ul>
+                    <li class="fragment">Add <code>stork-service-registration-consul</code> dependency</li>
+                    <li class="fragment">Configure registrar in <code>application.properties</code></li>
+                    <li class="fragment">Service registers itself on startup — zero code</li>
+                </ul>
+                <pre class="fragment"><code class="language-properties" data-trim>
+# application.properties
+quarkus.stork.band-service.service-registrar.type=consul
+quarkus.stork.band-service.service-registrar.consul-host=localhost
+quarkus.stork.band-service.service-registrar.consul-port=8500
+                </code></pre>
+            </section>
+
+            <!-- Live demo slide -->
+            <section class="demo-slide">
+                <h3>Song 1 — <span class="demo-label">Live Demo</span></h3>
+                <p style="font-size:0.7em">Start guitarist services and watch them register in Consul</p>
+                <div class="demo-panel">
+                    <h4 style="text-align:left; font-size:0.7em; margin-bottom:0.5em;">Registered Services</h4>
+                    <div id="registered-services" style="min-height:60px;">
+                        <p style="color:rgba(255,255,255,0.3); font-size:0.6em;">Waiting for services...</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ============== SONG 2: SERVICE DISCOVERY ============== -->
+        <section>
+            <!-- Explanation slide -->
+            <section>
+                <h2><span class="highlight-green">Song 2</span> — Service Discovery</h2>
+                <h3>Consul discovery with instance caching</h3>
+                <ul>
+                    <li class="fragment">Stork discovers instances from Consul</li>
+                    <li class="fragment"><strong>Caches</strong> the list — no network call per request</li>
+                    <li class="fragment">Cache refreshes every <code>refresh-period</code> (default: 5 min)</li>
+                </ul>
+                <pre class="fragment"><code class="language-properties" data-trim>
+quarkus.stork.band-service.service-discovery.type=consul
+quarkus.stork.band-service.service-discovery.consul-host=localhost
+quarkus.stork.band-service.load-balancer.type=round-robin
+                </code></pre>
+            </section>
+
+            <!-- Live demo slide -->
+            <section class="demo-slide">
+                <h3>Song 2 — <span class="demo-label">Live Demo</span></h3>
+                <div class="two-columns">
+                    <div class="demo-panel">
+                        <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 10, 'song2-results')">Play 10 notes (round-robin)</button>
+                        <button class="demo-btn demo-btn-light" onclick="clearResults('song2-results')">Clear</button>
+                        <div id="song2-results" class="result-grid"></div>
+                    </div>
+                    <div class="info-box">
+                        <p><strong>Caching:</strong> On the first call, Stork fetches instances from Consul and caches them.
+                           Subsequent calls use the cache.</p>
+                        <p style="margin-top:0.5em;"><strong>Try it:</strong> Start a new guitarist while this is running.
+                           It won't appear until the cache refreshes.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ============== SONG 3: BATTLE OF STRATEGIES ============== -->
+        <section>
+            <!-- Explanation slide -->
+            <section>
+                <h2><span class="highlight-blue">Song 3</span> — Battle of Strategies</h2>
+                <h3>Live Load Balancing comparison</h3>
+                <ul>
+                    <li class="fragment"><code>round-robin</code> — sequential distribution</li>
+                    <li class="fragment"><code>random</code> — probabilistic</li>
+                    <li class="fragment"><code>least-requests</code> — min in-flight count</li>
+                    <li class="fragment"><code>power-of-two-choices</code> — min of 2 random picks</li>
+                    <li class="fragment"><code>least-response-time</code> — time-weighted scoring</li>
+                    <li class="fragment"><code>sticky</code> — session affinity with failure backoff</li>
+                </ul>
+            </section>
+
+            <!-- Live demo slide -->
+            <section class="demo-slide">
+                <h3>Song 3 — <span class="demo-label">Live Demo</span></h3>
+                <p style="font-size:0.6em">Fire 20 calls and see which guitarist responds</p>
+                <div class="demo-panel">
+                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song3-results')">Fire 20 calls</button>
+                    <button class="demo-btn demo-btn-light" onclick="clearResults('song3-results')">Clear</button>
+                    <div id="song3-results" class="result-grid"></div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ============== SONG 4: TWO STAGES, ONE BAND ============== -->
+        <section>
+            <!-- Explanation slide -->
+            <section>
+                <h2><span class="highlight-yellow">Song 4</span> — Two Stages, One Band</h2>
+                <h3>Quarkus vs Spring Boot — same Stork, same band</h3>
+                <ul>
+                    <li class="fragment">Two dispatchers, same Stork config, same guitarists</li>
+                    <li class="fragment">Proves Stork is <strong>framework-agnostic</strong></li>
+                </ul>
+                <div class="two-columns fragment" style="font-size:0.7em; margin-top:1em;">
+                    <pre><code class="language-java" data-trim>
+// Quarkus — declarative
+@RegisterRestClient(
+  baseUri = "stork://band-service")
+public interface BandClient { ... }
+                    </code></pre>
+                    <pre><code class="language-java" data-trim>
+// Spring Boot — programmatic
+Service svc = stork
+  .getService("band-service");
+ServiceInstance inst = svc
+  .selectInstance().await()...;
+                    </code></pre>
+                </div>
+            </section>
+
+            <!-- Live demo slide -->
+            <section class="demo-slide">
+                <h3>Song 4 — <span class="demo-label">Live Demo</span></h3>
+                <div class="demo-panel">
+                    <button class="demo-btn demo-btn-primary" onclick="callBoth(10)">Play 10 notes on both stages</button>
+                    <button class="demo-btn demo-btn-light" onclick="clearResults('song4-quarkus'); clearResults('song4-spring')">Clear</button>
+                    <div class="two-columns" style="margin-top:1rem;">
+                        <div>
+                            <h4 style="font-size:0.7em; text-align:center;">Quarkus Stage</h4>
+                            <div id="song4-quarkus" class="result-grid"></div>
+                        </div>
+                        <div>
+                            <h4 style="font-size:0.7em; text-align:center;">Spring Boot Stage</h4>
+                            <div id="song4-spring" class="result-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ============== SONG 5: THE ENCORE ============== -->
+        <section>
+            <section>
+                <h2><span class="highlight-green">Song 5</span> — The Encore</h2>
+                <h3>Observability — Metrics &amp; Monitoring</h3>
+                <ul>
+                    <li class="fragment"><code>quarkus.micrometer.binder.stork.enabled=true</code></li>
+                    <li class="fragment">Service discovery duration</li>
+                    <li class="fragment">Load balancer selection duration</li>
+                    <li class="fragment">Error rates per instance</li>
+                    <li class="fragment">Prometheus + Grafana compatible</li>
+                </ul>
+            </section>
+
+            <section class="demo-slide">
+                <h3>Song 5 — <span class="demo-label">Live Demo</span></h3>
+                <p style="font-size:0.7em;">TODO: Embedded metrics panel (Prometheus / Grafana)</p>
+            </section>
+        </section>
+
+        <!-- ============== CLOSING ============== -->
+        <section>
+            <h1>Thank you!</h1>
+            <p style="font-size:0.7em; margin-top:1em;">SmallRye Stork — <a href="https://smallrye.io/smallrye-stork">smallrye.io/smallrye-stork</a></p>
+        </section>
+
+    </div>
+</div>
+
+<script src="/reveal.js/dist/reveal.js"></script>
+<script src="/reveal.js/plugin/highlight/highlight.js"></script>
+<script src="/reveal.js/plugin/markdown/markdown.js"></script>
 <script>
+    Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        transition: 'slide',
+        width: 1280,
+        height: 720,
+        plugins: [RevealHighlight, RevealMarkdown]
+    });
+
+    // === Demo logic ===
+
+    const guitaristImages = {
+        // 'slash': 'Slash.jpg',
+        // 'hendrix': 'JimiHendrix.jpg',
+        // 'eddie': 'EddieVanHalen.jpg'
+        'slash': 'Slash.png',
+        'hendrix': 'Hendrix.png',
+        'eddie': 'Eddie.png',
+        'flying': 'FlyingV.png'
+    };
+
+    const portToGuitarist = {
+        9000: 'slash',
+        9001: 'hendrix',
+        9002: 'eddie',
+        9003: 'flying'
+    };
+
     function callService(dispatcher, count, targetId) {
         const target = document.getElementById(targetId);
         for (let i = 0; i < count; i++) {
@@ -156,58 +425,89 @@
                 .then(name => {
                     const el = document.createElement('span');
                     const key = name.trim().toLowerCase();
-                    el.className = 'result-item ' + key;
-                    if (guitaristImages[key]) {
+                    if (key === 'fail') {
+                        el.className = 'result-item fail';
                         const img = document.createElement('img');
-                        img.src = '/' + guitaristImages[key];
+                        img.src = '/quarkus_icon_rgb_1024px_reverse.png';
                         el.appendChild(img);
                         const label = document.createElement('span');
-                        label.textContent = name.trim();
+                        label.textContent = 'FAIL';
                         el.appendChild(label);
                     } else {
-                        el.textContent = name.trim();
+                        el.className = 'result-item ' + key;
+                        if (guitaristImages[key]) {
+                            const img = document.createElement('img');
+                            img.src = '/' + guitaristImages[key];
+                            el.appendChild(img);
+                            const label = document.createElement('span');
+                            label.textContent = name.trim();
+                            el.appendChild(label);
+                        } else {
+                            el.textContent = name.trim();
+                        }
                     }
                     target.appendChild(el);
                 })
                 .catch(() => {
                     const el = document.createElement('span');
                     el.className = 'result-item fail';
-                    el.textContent = 'FAIL';
+                    const img = document.createElement('img');
+                    img.src = '/quarkus_icon_rgb_1024px_reverse.png';
+                    el.appendChild(img);
+                    const label = document.createElement('span');
+                    label.textContent = 'FAIL';
+                    el.appendChild(label);
                     target.appendChild(el);
                 });
         }
     }
 
     function callBoth(count) {
-        callService('quarkus', count, 'song3-quarkus');
-        callService('spring', count, 'song3-spring');
+        callService('quarkus', count, 'song4-quarkus');
+        callService('spring', count, 'song4-spring');
     }
 
     function clearResults(targetId) {
         document.getElementById(targetId).innerHTML = '';
     }
 
-    const guitaristImages = {
-        'slash': 'Slash.jpg',
-        'hendrix': 'JimiHendrix.jpg',
-        'eddie': 'EddieVanHalen.jpg'
-    };
-
-    const portToGuitarist = {
-        9000: 'slash',
-        9001: 'hendrix',
-        9002: 'eddie'
-    };
-
+    // Consul polling for Song 1
     let knownServices = new Set();
+
+    function buildServiceCard(svc) {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+
+        const dot = document.createElement('span');
+        dot.className = 'status-dot';
+        card.appendChild(dot);
+
+        const guitarist = portToGuitarist[svc.ServicePort];
+        if (guitarist && guitaristImages[guitarist]) {
+            const img = document.createElement('img');
+            img.src = '/' + guitaristImages[guitarist];
+            card.appendChild(img);
+        }
+
+        const label = document.createElement('span');
+        const displayName = guitarist ? guitarist.charAt(0).toUpperCase() + guitarist.slice(1) : 'unknown';
+        label.textContent = displayName + ' (' + svc.ServiceAddress + ':' + svc.ServicePort + ')';
+        label.style.fontSize = '0.6em';
+        card.appendChild(label);
+
+        return card;
+    }
 
     function pollConsulServices() {
         fetch('/consul/services')
             .then(r => r.json())
             .then(services => {
                 const container = document.getElementById('registered-services');
+                const overlay = document.getElementById('overlay-services');
+
                 if (!services || services.length === 0) {
-                    container.innerHTML = '<p class="has-text-grey-light">Waiting for services...</p>';
+                    if (container) container.innerHTML = '<p style="color:rgba(255,255,255,0.3); font-size:0.6em;">Waiting for services...</p>';
+                    if (overlay) overlay.innerHTML = '<span style="color:rgba(255,255,255,0.3); font-size:0.6rem;">No services</span>';
                     knownServices.clear();
                     return;
                 }
@@ -215,31 +515,20 @@
                 if (setsEqual(currentIds, knownServices)) return;
                 knownServices = currentIds;
 
-                container.innerHTML = '';
-                services.forEach(svc => {
-                    const card = document.createElement('div');
-                    card.className = 'service-card';
-
-                    const dot = document.createElement('span');
-                    dot.className = 'status-dot';
-                    card.appendChild(dot);
-
-                    const guitarist = portToGuitarist[svc.ServicePort];
-                    if (guitarist && guitaristImages[guitarist]) {
-                        const img = document.createElement('img');
-                        img.src = '/' + guitaristImages[guitarist];
-                        card.appendChild(img);
-                    }
-
-                    const label = document.createElement('span');
-                    const displayName = guitarist ? guitarist.charAt(0).toUpperCase() + guitarist.slice(1) : 'unknown';
-                    label.textContent = displayName + ' (' + svc.ServiceAddress + ':' + svc.ServicePort + ')';
-                    card.appendChild(label);
-
-                    container.appendChild(card);
-                });
+                if (container) {
+                    container.innerHTML = '';
+                    services.forEach(svc => container.appendChild(buildServiceCard(svc)));
+                }
+                if (overlay) {
+                    overlay.innerHTML = '';
+                    services.forEach(svc => overlay.appendChild(buildServiceCard(svc)));
+                }
             })
             .catch(() => {});
+    }
+
+    function toggleServicesOverlay() {
+        document.getElementById('services-overlay').classList.toggle('open');
     }
 
     function setsEqual(a, b) {

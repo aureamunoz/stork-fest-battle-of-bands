@@ -7,6 +7,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @Path("/")
@@ -30,14 +31,22 @@ public class StageManagerResource {
     @GET
     @Path("/call/quarkus")
     @Produces(MediaType.TEXT_PLAIN)
-    public String callQuarkus() {
-        return quarkusDispatcher.dispatch();
+    public Response callQuarkus() {
+        try {
+            return Response.ok(quarkusDispatcher.dispatch()).build();
+        } catch (Exception e) {
+            return Response.ok("FAIL").build();
+        }
     }
 
     @GET
     @Path("/call/spring")
     @Produces(MediaType.TEXT_PLAIN)
-    public String callSpring() {
-        return springDispatcher.dispatch();
+    public Response callSpring() {
+        try {
+            return Response.ok(springDispatcher.dispatch()).build();
+        } catch (Exception e) {
+            return Response.ok("FAIL").build();
+        }
     }
 }

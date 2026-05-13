@@ -26,6 +26,7 @@
    GUITAR_HERO=Hendrix GUITAR_HERO_PORT=9001 GUITAR_HERO_DELAY_MS=500 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
 
 GUITAR_HERO=Eddie GUITAR_HERO_PORT=9002 GUITAR_HERO_DELAY_MS=5 GUITAR_HERO_FAILURE_RATIO=20 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
+GUITAR_HERO=Flying GUITAR_HERO_PORT=9003 GUITAR_HERO_DELAY_MS=5 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
 
 También puedes ver el Consul UI directamente en http://localhost:8500.
 
