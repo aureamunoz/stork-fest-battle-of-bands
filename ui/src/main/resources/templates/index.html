@@ -9,15 +9,50 @@
         .song-section { margin-bottom: 2rem; }
         .result-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
         .result-item {
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.4rem;
+            border-radius: 8px;
             font-weight: bold;
+            font-size: 0.75rem;
         }
-        .result-item.slash { background: #f39c12; color: white; }
-        .result-item.hendrix { background: #8e44ad; color: white; }
-        .result-item.eddie { background: #e74c3c; color: white; }
-        .result-item.fail { background: #95a5a6; color: white; }
+        .result-item img {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid transparent;
+        }
+        .result-item.slash img { border-color: #f39c12; }
+        .result-item.hendrix img { border-color: #8e44ad; }
+        .result-item.eddie img { border-color: #e74c3c; }
+        .result-item.fail { background: #95a5a6; color: white; padding: 0.5rem 1rem; border-radius: 4px; }
         .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+        .service-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            background: #f5f5f5;
+            margin: 0.25rem;
+            animation: fadeIn 0.4s ease-in;
+        }
+        .service-card .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #48c774;
+        }
+        .service-card img {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -31,11 +66,24 @@
             <h2 class="title is-3">Song 1 — Plug & Play</h2>
             <p class="subtitle is-5">Auto-registration with Consul</p>
             <p>Guitarist services auto-register when they start. Watch them appear!</p>
-            <button class="button is-primary" onclick="callService('quarkus', 10, 'song1-results')">
-                Play 10 notes (Quarkus)
-            </button>
-            <button class="button is-light" onclick="clearResults('song1-results')">Clear</button>
-            <div id="song1-results" class="result-grid"></div>
+
+            <div class="columns mt-4">
+                <div class="column is-half">
+                    <h4 class="title is-5">Registered Services</h4>
+                    <div id="registered-services">
+                        <p class="has-text-grey-light">Waiting for services...</p>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="buttons">
+                        <button class="button is-primary" onclick="callService('quarkus', 10, 'song1-results')">
+                            Play 10 notes
+                        </button>
+                        <button class="button is-light" onclick="clearResults('song1-results')">Clear</button>
+                    </div>
+                    <div id="song1-results" class="result-grid"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Song 2: Battle of Strategies -->
@@ -88,8 +136,18 @@
                 .then(r => r.text())
                 .then(name => {
                     const el = document.createElement('span');
-                    el.className = 'result-item ' + name.toLowerCase();
-                    el.textContent = name;
+                    const key = name.trim().toLowerCase();
+                    el.className = 'result-item ' + key;
+                    if (guitaristImages[key]) {
+                        const img = document.createElement('img');
+                        img.src = '/' + guitaristImages[key];
+                        el.appendChild(img);
+                        const label = document.createElement('span');
+                        label.textContent = name.trim();
+                        el.appendChild(label);
+                    } else {
+                        el.textContent = name.trim();
+                    }
                     target.appendChild(el);
                 })
                 .catch(() => {
@@ -109,6 +167,64 @@
     function clearResults(targetId) {
         document.getElementById(targetId).innerHTML = '';
     }
+
+    const guitaristImages = {
+        'slash': 'Slash.jpg',
+        'hendrix': 'JimiHendrix.jpg',
+        'eddie': 'EddieVanHalen.jpg'
+    };
+
+    let knownServices = new Set();
+
+    function pollConsulServices() {
+        fetch('/consul/services')
+            .then(r => r.json())
+            .then(services => {
+                const container = document.getElementById('registered-services');
+                if (!services || services.length === 0) {
+                    container.innerHTML = '<p class="has-text-grey-light">Waiting for services...</p>';
+                    knownServices.clear();
+                    return;
+                }
+                const currentIds = new Set(services.map(s => s.ServiceID));
+                if (setsEqual(currentIds, knownServices)) return;
+                knownServices = currentIds;
+
+                container.innerHTML = '';
+                services.forEach(svc => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card';
+
+                    const dot = document.createElement('span');
+                    dot.className = 'status-dot';
+                    card.appendChild(dot);
+
+                    const name = svc.ServiceID || svc.ServiceName || 'unknown';
+                    const imgKey = Object.keys(guitaristImages).find(k => name.toLowerCase().includes(k));
+                    if (imgKey) {
+                        const img = document.createElement('img');
+                        img.src = '/' + guitaristImages[imgKey];
+                        card.appendChild(img);
+                    }
+
+                    const label = document.createElement('span');
+                    label.textContent = name + ' (' + svc.ServiceAddress + ':' + svc.ServicePort + ')';
+                    card.appendChild(label);
+
+                    container.appendChild(card);
+                });
+            })
+            .catch(() => {});
+    }
+
+    function setsEqual(a, b) {
+        if (a.size !== b.size) return false;
+        for (const v of a) if (!b.has(v)) return false;
+        return true;
+    }
+
+    setInterval(pollConsulServices, 2000);
+    pollConsulServices();
 </script>
 </body>
 </html>
