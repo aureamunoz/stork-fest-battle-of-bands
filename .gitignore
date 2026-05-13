@@ -17,3 +17,4 @@ target/
 # Claude
 .claude/
 CLAUDE.md
+Implementation-plan.md
