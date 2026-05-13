@@ -1,6 +1,6 @@
 package org.acme.stork.guitarist;
 
-import io.smallrye.common.annotation.NonBlocking;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -26,7 +26,7 @@ public class GuitarHeroResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @NonBlocking
+    @Blocking
     public Response play() {
         if (delayMs > 0) {
             try {
@@ -46,7 +46,6 @@ public class GuitarHeroResource {
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
-    @NonBlocking
     public String health() {
         return "OK";
     }
