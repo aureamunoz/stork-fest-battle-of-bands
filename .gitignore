@@ -1,0 +1,19 @@
+# Maven
+target/
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+
+# Quarkus
+.quarkus/
+
+# Claude
+.claude/
+CLAUDE.md
