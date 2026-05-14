@@ -1,6 +1,6 @@
 # Desarrollo de la demo STORKFEST
 
-### Song 1 : autoregistro + service discovery con Consul
+### Song 1 : autorregistro + service discovery con Consul
 
 1. Arranca Consul:
    podman run --rm -p 8500:8500 hashicorp/consul:1.20 agent -dev -client=0.0.0.0
