@@ -5,9 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stork — Battle of the Bands</title>
     <link rel="stylesheet" href="/reveal.js/dist/reveal.css">
-    <link rel="stylesheet" href="/reveal.js/dist/theme/black-contrast.css">
+    <link rel="stylesheet" href="/reveal.js/dist/theme/beige.css">
     <link rel="stylesheet" href="/reveal.js/plugin/highlight/monokai.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --r-main-font: 'Montserrat', Helvetica, sans-serif;
+            --r-heading-font: 'Montserrat', Helvetica, sans-serif;
+            --r-heading-font-weight: 900;
+            --r-main-font-weight: 800;
+        }
+        .reveal { font-weight: 800; }
         .reveal h1, .reveal h2, .reveal h3 {
             text-transform: none;
         }
@@ -26,9 +36,12 @@
         .reveal section h1, .reveal section h2, .reveal section h3, .reveal section p {
             text-align: center;
         }
-        .highlight-yellow { color: #eee600; font-weight: bold; }
-        .highlight-green { color: #2ecc71; font-weight: bold; }
-        .highlight-blue { color: #3498db; font-weight: bold; }
+        /*.highlight-yellow { color: #eee600; font-weight: bold; }*/
+        /*.highlight-green { color: #2ecc71; font-weight: bold; }*/
+        /*.highlight-blue { color: #3498db; font-weight: bold; }*/
+        .highlight-yellow { color: #c49a00; font-weight: bold; }
+        .highlight-green { color: #1e8449; font-weight: bold; }
+        .highlight-blue { color: #1a5276; font-weight: bold; }
         .demo-label {
             background: #e74c3c;
             color: white;
@@ -200,7 +213,9 @@
 
         <!-- ============== TITLE ============== -->
         <section>
-            <h1>Stork</h1>
+            <h1>
+                <img src="/images/Storkfest.png" alt="Storkfest" style="max-width: 60%; max-height: 60vh;">
+            </h1>
             <h2>Battle of the Bands</h2>
             <p>SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
             <p style="font-size: 0.6em; margin-top: 2em;">Aurea Munoz — 2026</p>
