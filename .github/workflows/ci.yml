@@ -1,8 +1,7 @@
 name: Basic build to ensure everything is ok
 
 on:
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch: # manual only
 
 jobs:
   build:
