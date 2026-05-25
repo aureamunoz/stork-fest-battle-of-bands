@@ -1,52 +1,42 @@
-# Desarrollo de la demo STORKFEST
+# Storkfest Demo
 
-### Song 1 : autorregistro + service discovery con Consul
+### Song 1: Auto-registration + Service Discovery with Consul
 
-1. Arranca Consul:
+1. Start Consul:
+   ```
    podman run --rm -p 8500:8500 hashicorp/consul:1.20 agent -dev -client=0.0.0.0
+   ```
 
-2. Arranca el primer guitarrista (Slash):
+2. Start the first guitarist (Slash):
+   ```
    mvn quarkus:dev -pl guitar-hero-service
-   (Por defecto: Slash, puerto 9000, delay 300ms)
+   ```
+   (Default: Slash, port 9000, 300ms delay)
 
-3. Verifica en Consul que se registró:
+3. Verify registration in Consul:
+   ```
    curl -s http://localhost:8500/v1/catalog/service/band-service | jq
+   ```
 
-4. Arranca el dispatcher-quarkus (en otra terminal):
+4. Start the Quarkus dispatcher (new terminal):
+   ```
    mvn quarkus:dev -pl dispatcher-quarkus -Ddebug=false
+   ```
 
-5. Arranca el UI (en otra terminal):
+5. Start the UI (new terminal):
+   ```
    mvn quarkus:dev -pl ui -Ddebug=false
+   ```
 
-6. Abre el navegador:
+6. Open the browser:
    http://localhost:8082
-   En Song 1 deberias ver a Slash en el panel "Registered Services". Pulsa "Play 10 notes" para probar.
+   In Song 1 you should see Slash in the "Registered Services" panel. Click "Play 10 notes" to test.
 
-7. (Opcional) Arranca mas guitarristas para verlos aparecer en tiempo real:
+7. (Optional) Start more guitarists to see them appear in real time:
+   ```
    GUITAR_HERO=Hendrix GUITAR_HERO_PORT=9001 GUITAR_HERO_DELAY_MS=500 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
+   GUITAR_HERO=Eddie GUITAR_HERO_PORT=9002 GUITAR_HERO_DELAY_MS=5 GUITAR_HERO_FAILURE_RATIO=20 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
+   GUITAR_HERO=Flying GUITAR_HERO_PORT=9003 GUITAR_HERO_DELAY_MS=5 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
+   ```
 
-GUITAR_HERO=Eddie GUITAR_HERO_PORT=9002 GUITAR_HERO_DELAY_MS=5 GUITAR_HERO_FAILURE_RATIO=20 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
-GUITAR_HERO=Flying GUITAR_HERO_PORT=9003 GUITAR_HERO_DELAY_MS=5 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
-
-También puedes ver el Consul UI directamente en http://localhost:8500.
-
-
-
-4. Arranca el dispatcher-quarkus (en otra terminal):
-   mvn quarkus:dev -pl dispatcher-quarkus -Ddebug=false
-
-5. Arranca el UI (en otra terminal):
-   mvn quarkus:dev -pl ui -Ddebug=false
-
-6. Abre el navegador:
-   http://localhost:8082
-
-En Song 1 deberias ver a Slash en el panel "Registered Services". Pulsa "Play 10 notes" para probar.
-
-7. (Opcional) Arranca mas guitarristas para verlos aparecer en tiempo real:
-   GUITAR_HERO=Hendrix GUITAR_HERO_PORT=9001 GUITAR_HERO_DELAY_MS=500 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
-
-GUITAR_HERO=Eddie GUITAR_HERO_PORT=9002 GUITAR_HERO_DELAY_MS=5 GUITAR_HERO_FAILURE_RATIO=20 mvn quarkus:dev -pl guitar-hero-service -Ddebug=false
-
-También puedes ver el Consul UI directamente en http://localhost:8500.
-
+You can also view the Consul UI directly at http://localhost:8500.
