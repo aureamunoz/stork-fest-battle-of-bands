@@ -13,4 +13,9 @@ public interface QuarkusDispatcherClient {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     String dispatch();
+
+    @GET
+    @Path("/config")
+    @Produces(MediaType.APPLICATION_JSON)
+    String config();
 }

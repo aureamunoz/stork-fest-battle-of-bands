@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stork — Battle of the Bands</title>
     <link rel="stylesheet" href="/reveal.js/dist/reveal.css">
-    <link rel="stylesheet" href="/reveal.js/dist/theme/beige.css">
+    <link rel="stylesheet" href="/reveal.js/dist/theme/black-contrast.css">
     <link rel="stylesheet" href="/reveal.js/plugin/highlight/monokai.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,12 +36,12 @@
         .reveal section h1, .reveal section h2, .reveal section h3, .reveal section p {
             text-align: center;
         }
-        /*.highlight-yellow { color: #eee600; font-weight: bold; }*/
-        /*.highlight-green { color: #2ecc71; font-weight: bold; }*/
-        /*.highlight-blue { color: #3498db; font-weight: bold; }*/
-        .highlight-yellow { color: #c49a00; font-weight: bold; }
-        .highlight-green { color: #1e8449; font-weight: bold; }
-        .highlight-blue { color: #1a5276; font-weight: bold; }
+        .highlight-yellow { color: #eee600 !important; font-weight: bold; }
+        .highlight-green { color: #2ecc71 !important; font-weight: bold; }
+        .highlight-blue { color: #3498db !important; font-weight: bold; }
+        /*.reveal .highlight-yellow { color: #c49a00 !important; font-weight: bold; }*/
+        /*.reveal .highlight-green { color: #1e8449 !important; font-weight: bold; }*/
+        /*.reveal .highlight-blue { color: #1a5276 !important; font-weight: bold; }*/
         .demo-label {
             background: #e74c3c;
             color: white;
@@ -218,12 +218,82 @@
 
         <!-- ============== TITLE ============== -->
         <section>
-            <h1>
-                <img src="/images/Storkfest.png" alt="Storkfest" style="max-width: 60%; max-height: 60vh;">
+            <h1 style="margin-bottom: 0;">
+                <img src="/images/Storkfest-red.png" alt="Storkfest" style="max-width: 55%; max-height: 45vh;">
             </h1>
-            <h2>Battle of the Bands</h2>
-            <p>SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
-            <p style="font-size: 0.6em; margin-top: 2em;">Aurea Munoz — 2026</p>
+            <h2 style="margin-top: 0.1em; margin-bottom: 0.2em;">Battle of the Bands</h2>
+            <p style="margin-bottom: 0.2em;">SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
+            <p style="font-size: 0.6em; margin-top: 0.8em;">Áurea Muñoz for Commit Conf 2026</p>
+        </section>
+
+        <!-- ============== Who Am I ============== -->
+        <section>
+            <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 2rem; align-items: center; height: 100%;">
+                <!-- Left: photo -->
+                <div style="display: flex; justify-content: center;">
+                    <img src="/images/Auri-bio-picture.jpg" alt="Áurea Muñoz"
+                         style="width: 320px; height: 320px; border-radius: 50%; object-fit: cover; object-position: top;">
+                </div>
+                <!-- Right: bio -->
+                <div style="text-align: left;">
+                    <h2 style="margin-bottom: 1.2em;">Áurea Muñoz</h2>
+                    <div style="display: flex; flex-direction: column; gap: 0.8em; padding-left: 2em;">
+                        <div style="display: flex; align-items: center; gap: 0.8em;">
+                            <img src="/images/ppal-engineer.png" alt="" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0;">
+                            <span style="font-size: 0.55em;">Principal Software Engineer at IBM</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.8em;">
+                            <img src="/images/javachampions_twitter.jpeg" alt="" style="width: 48px; height: 48px; object-fit: contain; border-radius: 50%; flex-shrink: 0;">
+                            <span style="font-size: 0.55em;">Java Champion</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.8em;">
+                            <img src="/images/duchess.png" alt="" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0;">
+                            <span style="font-size: 0.55em;">Madrid JUG leader</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2 >The problem</h2>
+            <div style="display: flex; justify-content: center;">
+                <img src="/images/theproblem.png" alt="The problem"
+                     style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+            </div>
+        </section>
+
+        <section>
+            <h2>The solution</h2>
+            <div style="display: flex; justify-content: center;">
+                <img src="/images/thesolution.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+            </div>
+        </section>
+
+        <section>
+            <h2>Concepts</h2>
+            <div style="display: flex; justify-content: center;">
+                <img src="/images/concepts.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+            </div>
+        </section>
+
+        <section>
+            <h2>Managed approach: Stork and Quarkus</h2>
+            <div style="display: flex; justify-content: center;">
+                <img src="/images/quarkus-stork.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+            </div>
+        </section>
+
+        <section>
+            <h1>
+                <img src="/images/demo.png" alt="Demo" style="max-width: 60%; max-height: 60vh;">
+            </h1>
+        </section>
+
+        <section>
+            <h2>The Stork fest architecture</h2>
+            <div style="display: flex; justify-content: center;">
+                <img src="/images/guitar-hero-app.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+            </div>
         </section>
 
         <!-- ============== AGENDA ============== -->
@@ -326,9 +396,13 @@ quarkus.stork.band-service.load-balancer.type=round-robin
             <!-- Live demo slide -->
             <section class="demo-slide">
                 <h3>Song 3 — <span class="demo-label">Live Demo</span></h3>
-                <p style="font-size:0.6em">Fire 20 calls and see which guitarist responds</p>
+                <p style="font-size:0.55em">
+                    Service Discovery: <strong id="song3-sd" class="highlight-yellow">—</strong> &nbsp;|&nbsp;
+                    Load Balancer: <strong id="song3-lb" class="highlight-yellow">—</strong>
+                </p>
                 <div class="demo-panel">
-                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song3-results')">Fire 20 calls</button>
+                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song3-results')">Fire 20 concurrent</button>
+                    <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 20, 'song3-results')">Fire 20 sequential</button>
                     <button class="demo-btn demo-btn-light" onclick="clearResults('song3-results')">Clear</button>
                     <div id="song3-results" class="result-grid"></div>
                 </div>
@@ -488,6 +562,55 @@ ServiceInstance inst = svc
         }
     }
 
+    async function callServiceSequential(dispatcher, count, targetId) {
+        const target = document.getElementById(targetId);
+        for (let i = 0; i < count; i++) {
+            await fetch('/call/' + dispatcher)
+                .then(r => r.text())
+                .then(name => appendResult(target, name))
+                .catch(() => appendResult(target, 'fail'));
+        }
+    }
+
+    function appendResult(target, name) {
+        const el = document.createElement('span');
+        const key = name.trim().toLowerCase();
+        if (key === 'fail') {
+            el.className = 'result-item fail';
+            const img = document.createElement('img');
+            img.src = '/quarkus_icon_rgb_1024px_reverse.png';
+            el.appendChild(img);
+            const label = document.createElement('span');
+            label.textContent = 'FAIL';
+            el.appendChild(label);
+        } else {
+            el.className = 'result-item ' + key;
+            if (guitaristImages[key]) {
+                const img = document.createElement('img');
+                img.src = '/' + guitaristImages[key];
+                el.appendChild(img);
+                const label = document.createElement('span');
+                label.textContent = name.trim();
+                el.appendChild(label);
+            } else {
+                el.textContent = name.trim();
+            }
+        }
+        target.appendChild(el);
+    }
+
+    function loadSong3Config() {
+        fetch('/config/quarkus')
+            .then(r => r.json())
+            .then(cfg => {
+                const sdEl = document.getElementById('song3-sd');
+                const lbEl = document.getElementById('song3-lb');
+                if (sdEl) sdEl.textContent = cfg.sd;
+                if (lbEl) lbEl.textContent = cfg.lb;
+            })
+            .catch(() => {});
+    }
+
     function callBoth(count) {
         callService('quarkus', count, 'song4-quarkus');
         callService('spring', count, 'song4-spring');
@@ -566,6 +689,7 @@ ServiceInstance inst = svc
 
     setInterval(pollConsulServices, 2000);
     pollConsulServices();
+    loadSong3Config();
 </script>
 </body>
 </html>

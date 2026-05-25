@@ -29,6 +29,17 @@ public class StageManagerResource {
     }
 
     @GET
+    @Path("/config/quarkus")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response configQuarkus() {
+        try {
+            return Response.ok(quarkusDispatcher.config()).build();
+        } catch (Exception e) {
+            return Response.ok("{\"sd\":\"?\",\"lb\":\"?\"}").build();
+        }
+    }
+
+    @GET
     @Path("/call/quarkus")
     @Produces(MediaType.TEXT_PLAIN)
     public Response callQuarkus() {
