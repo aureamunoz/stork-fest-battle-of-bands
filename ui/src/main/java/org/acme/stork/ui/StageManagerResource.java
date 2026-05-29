@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+
 @Path("/")
 public class StageManagerResource {
 
@@ -58,6 +59,17 @@ public class StageManagerResource {
             return Response.ok(springDispatcher.dispatch()).build();
         } catch (Exception e) {
             return Response.ok("FAIL").build();
+        }
+    }
+
+    @GET
+    @Path("/metrics/stork")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response storkMetrics() {
+        try {
+            return Response.ok(quarkusDispatcher.storkMetrics()).build();
+        } catch (Exception e) {
+            return Response.status(503).build();
         }
     }
 }

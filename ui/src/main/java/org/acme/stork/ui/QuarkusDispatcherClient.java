@@ -18,4 +18,9 @@ public interface QuarkusDispatcherClient {
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
     String config();
+
+    @GET
+    @Path("/stork-metrics")
+    @Produces(MediaType.APPLICATION_JSON)
+    String storkMetrics();
 }

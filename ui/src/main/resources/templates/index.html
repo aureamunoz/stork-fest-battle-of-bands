@@ -64,6 +64,8 @@
             gap: 0.5rem;
             margin-top: 1rem;
             min-height: 70px;
+            max-height: 260px;
+            overflow-y: auto;
         }
         .result-item {
             display: inline-flex;
@@ -85,6 +87,17 @@
         .result-item.eddie img { border-color: #e74c3c; }
         .result-item.flying img { border-color: #2ecc71; }
         .result-item.fail img { border-color: #4695eb; }
+        .result-item.pending .slot-circle {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 3px dashed rgba(255,255,255,0.3);
+            animation: pending-pulse 0.9s ease-in-out infinite;
+        }
+        @keyframes pending-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.85; }
+        }
         .service-card {
             display: inline-flex;
             align-items: center;
@@ -303,8 +316,9 @@
                 <li><span class="highlight-yellow">Song 1</span> — Plug &amp; Play <span style="font-size:0.7em">(Auto-registration)</span></li>
                 <li><span class="highlight-green">Song 2</span> — Service Discovery <span style="font-size:0.7em">(Discovery + Caching)</span></li>
                 <li><span class="highlight-blue">Song 3</span> — Battle of Strategies <span style="font-size:0.7em">(Load Balancing)</span></li>
-                <li><span class="highlight-yellow">Song 4</span> — Two Stages, One Band <span style="font-size:0.7em">(Quarkus + Spring Boot)</span></li>
-                <li><span class="highlight-green">Song 5</span> — The Encore <span style="font-size:0.7em">(Observability)</span></li>
+                <li><span class="highlight-yellow">Song 4</span> — Guns n Roses <span style="font-size:0.7em">(Custom Load Balancing)</span></li>
+                <li><span class="highlight-green">Song 5</span> — Two Stages, One Band <span style="font-size:0.7em">(Quarkus + Spring Boot)</span></li>
+                <li><span class="highlight-blue">Song 6</span> — The Encore <span style="font-size:0.7em">(Observability)</span></li>
             </ul>
         </section>
 
@@ -363,7 +377,8 @@ quarkus.stork.band-service.load-balancer.type=round-robin
                 <h3>Song 2 — <span class="demo-label">Live Demo</span></h3>
                 <div class="two-columns">
                     <div class="demo-panel">
-                        <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 10, 'song2-results')">Play 10 notes (round-robin)</button>
+                        <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 10, 'song2-results')">Play concurrent (round-robin)</button>
+                        <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 10, 'song2-results')">Play 10 sequential (round-robin)</button>
                         <button class="demo-btn demo-btn-light" onclick="clearResults('song2-results')">Clear</button>
                         <div id="song2-results" class="result-grid"></div>
                     </div>
@@ -409,11 +424,70 @@ quarkus.stork.band-service.load-balancer.type=round-robin
             </section>
         </section>
 
-        <!-- ============== SONG 4: TWO STAGES, ONE BAND ============== -->
+        <!-- ============== SONG 4: GUNS N ROSES ============== -->
         <section>
             <!-- Explanation slide -->
             <section>
-                <h2><span class="highlight-yellow">Song 4</span> — Two Stages, One Band</h2>
+                <h2><span class="highlight-blue">Song 4</span> — Guns n Roses</h2>
+                <h3>Custom Load Balancing</h3>
+                <ul>
+                    <li class="fragment">Implement <code>LoadBalancer</code> + <code>LoadBalancerProvider</code></li>
+                    <li class="fragment">Annotate el provider con <code>@LoadBalancerType("custom-load-balancer")</code></li>
+                    <li class="fragment">Stork lo descubre vía SPI: zero configuración extra</li>
+                </ul>
+                <div class="two-columns fragment" style="margin-top:1em;">
+                    <pre><code class="language-java" data-trim>
+@LoadBalancerType("custom-load-balancer")
+@ApplicationScoped
+public class CustomLoadBalancerProvider
+  implements LoadBalancerProvider&lt;...&gt; {
+
+  public LoadBalancer createLoadBalancer(
+      ..., ServiceDiscovery sd) {
+    return new CustomLoadBalancer(config);
+  }
+}
+                    </code></pre>
+                    <pre><code class="language-java" data-trim>
+public ServiceInstance selectServiceInstance(
+    Collection&lt;ServiceInstance&gt; instances) {
+
+  for (ServiceInstance si : instances) {
+    if (si.getLabels()
+          .containsKey("guns-n-roses"))
+      return si;
+  }
+  throw new NoServiceInstanceFoundException();
+}
+                    </code></pre>
+                </div>
+                <pre class="fragment"><code class="language-properties" data-trim>
+quarkus.stork.band-service.load-balancer.type=custom-load-balancer
+                </code></pre>
+            </section>
+
+            <!-- Live demo slide -->
+            <section class="demo-slide">
+                <h3>Song 4 — <span class="demo-label">Live Demo</span></h3>
+                <p style="font-size:0.55em">
+                    Service Discovery: <strong id="song4-sd" class="highlight-yellow">—</strong> &nbsp;|&nbsp;
+                    Load Balancer: <strong id="song4-lb" class="highlight-yellow">—</strong>
+                </p>
+                <div class="demo-panel">
+                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song4-results')">Fire 20 concurrent</button>
+                    <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 20, 'song4-results')">Fire 20 sequential</button>
+                    <button class="demo-btn demo-btn-light" onclick="clearResults('song4-results')">Clear</button>
+                    <div id="song4-results" class="result-grid"></div>
+                </div>
+            </section>
+        </section>
+
+
+        <!-- ============== SONG 5: TWO STAGES, ONE BAND ============== -->
+        <section>
+            <!-- Explanation slide -->
+            <section>
+                <h2><span class="highlight-yellow">Song 5</span> — Two Stages, One Band</h2>
                 <h3>Quarkus vs Spring Boot — same Stork, same band</h3>
                 <ul>
                     <li class="fragment">Two dispatchers, same Stork config, same guitarists</li>
@@ -438,7 +512,7 @@ ServiceInstance inst = svc
 
             <!-- Live demo slide -->
             <section class="demo-slide">
-                <h3>Song 4 — <span class="demo-label">Live Demo</span></h3>
+                <h3>Song 5 — <span class="demo-label">Live Demo</span></h3>
                 <div class="demo-panel">
                     <button class="demo-btn demo-btn-primary" onclick="callBoth(10)">Play 10 notes on both stages</button>
                     <button class="demo-btn demo-btn-light" onclick="clearResults('song4-quarkus'); clearResults('song4-spring')">Clear</button>
@@ -459,7 +533,7 @@ ServiceInstance inst = svc
         <!-- ============== SONG 5: THE ENCORE ============== -->
         <section>
             <section>
-                <h2><span class="highlight-green">Song 5</span> — The Encore</h2>
+                <h2><span class="highlight-green">Song 6</span> — The Encore</h2>
                 <h3>Observability — Metrics &amp; Monitoring</h3>
                 <ul>
                     <li class="fragment"><code>quarkus.micrometer.binder.stork.enabled=true</code></li>
@@ -471,8 +545,56 @@ ServiceInstance inst = svc
             </section>
 
             <section class="demo-slide">
-                <h3>Song 5 — <span class="demo-label">Live Demo</span></h3>
-                <p style="font-size:0.7em;">TODO: Embedded metrics panel (Prometheus / Grafana)</p>
+                <h3>Song 6 — <span class="demo-label">Live Demo</span></h3>
+                <div style="margin-bottom:0.8rem;">
+                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song6-results')">Fire 20 concurrent</button>
+                    <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 20, 'song6-results')">Fire 20 sequential</button>
+                    <button class="demo-btn demo-btn-light" onclick="clearResults('song6-results')">Clear</button>
+                    <div id="song6-results" class="result-grid" style="max-height:80px;"></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem;">
+                    <div class="demo-panel">
+                        <h4 style="font-size:0.65em; margin:0 0 0.8em; text-align:center;">Service Discovery</h4>
+                        <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.55em;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Calls</span>
+                                <strong id="m-disc-count" class="highlight-yellow">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Avg duration</span>
+                                <strong id="m-disc-avg" class="highlight-green">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Failures</span>
+                                <strong id="m-disc-fail" class="highlight-blue">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Instances found</span>
+                                <strong id="m-instances" class="highlight-yellow">—</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="demo-panel">
+                        <h4 style="font-size:0.65em; margin:0 0 0.8em; text-align:center;">Load Balancer Selection</h4>
+                        <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.55em;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Calls</span>
+                                <strong id="m-sel-count" class="highlight-yellow">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Avg duration</span>
+                                <strong id="m-sel-avg" class="highlight-green">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>Failures</span>
+                                <strong id="m-sel-fail" class="highlight-blue">—</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size:0.45em; text-align:center; margin-top:1rem; opacity:0.5;">
+                    actualizando cada 2s · fuente: /q/metrics (Micrometer + Prometheus)
+                </p>
             </section>
         </section>
 
@@ -501,13 +623,10 @@ ServiceInstance inst = svc
     // === Demo logic ===
 
     const guitaristImages = {
-        // 'slash': 'Slash.jpg',
-        // 'hendrix': 'JimiHendrix.jpg',
-        // 'eddie': 'EddieVanHalen.jpg'
-        'slash': 'Slash.png',
-        'hendrix': 'Hendrix.png',
-        'eddie': 'Eddie.png',
-        'flying': 'FlyingV.png'
+        'slash':  'images/Slash.png',
+        'hendrix': 'images/Hendrix.png',
+        'eddie':  'images/Eddie.png',
+        'flying': 'images/FlyingV.png'
     };
 
     const portToGuitarist = {
@@ -517,68 +636,30 @@ ServiceInstance inst = svc
         9003: 'flying'
     };
 
-    function callService(dispatcher, count, targetId) {
-        const target = document.getElementById(targetId);
-        for (let i = 0; i < count; i++) {
-            fetch('/call/' + dispatcher)
-                .then(r => r.text())
-                .then(name => {
-                    const el = document.createElement('span');
-                    const key = name.trim().toLowerCase();
-                    if (key === 'fail') {
-                        el.className = 'result-item fail';
-                        const img = document.createElement('img');
-                        img.src = '/quarkus_icon_rgb_1024px_reverse.png';
-                        el.appendChild(img);
-                        const label = document.createElement('span');
-                        label.textContent = 'FAIL';
-                        el.appendChild(label);
-                    } else {
-                        el.className = 'result-item ' + key;
-                        if (guitaristImages[key]) {
-                            const img = document.createElement('img');
-                            img.src = '/' + guitaristImages[key];
-                            el.appendChild(img);
-                            const label = document.createElement('span');
-                            label.textContent = name.trim();
-                            el.appendChild(label);
-                        } else {
-                            el.textContent = name.trim();
-                        }
-                    }
-                    target.appendChild(el);
-                })
-                .catch(() => {
-                    const el = document.createElement('span');
-                    el.className = 'result-item fail';
-                    const img = document.createElement('img');
-                    img.src = '/quarkus_icon_rgb_1024px_reverse.png';
-                    el.appendChild(img);
-                    const label = document.createElement('span');
-                    label.textContent = 'FAIL';
-                    el.appendChild(label);
-                    target.appendChild(el);
-                });
-        }
-    }
-
-    async function callServiceSequential(dispatcher, count, targetId) {
-        const target = document.getElementById(targetId);
-        for (let i = 0; i < count; i++) {
-            await fetch('/call/' + dispatcher)
-                .then(r => r.text())
-                .then(name => appendResult(target, name))
-                .catch(() => appendResult(target, 'fail'));
-        }
-    }
-
-    function appendResult(target, name) {
+    function createPlaceholder() {
         const el = document.createElement('span');
+        el.className = 'result-item pending';
+        const circle = document.createElement('div');
+        circle.className = 'slot-circle';
+        el.appendChild(circle);
+        const label = document.createElement('span');
+        label.textContent = '...';
+        el.appendChild(label);
+        return el;
+    }
+
+    const failIcons = {
+        'quarkus': '/images/quarkus_icon_rgb_1024px_reverse.png',
+        'spring':  '/images/sb-icon.jpg'
+    };
+
+    function fillSlot(el, name, dispatcher = 'quarkus') {
+        el.innerHTML = '';
         const key = name.trim().toLowerCase();
         if (key === 'fail') {
             el.className = 'result-item fail';
             const img = document.createElement('img');
-            img.src = '/quarkus_icon_rgb_1024px_reverse.png';
+            img.src = failIcons[dispatcher] || failIcons['quarkus'];
             el.appendChild(img);
             const label = document.createElement('span');
             label.textContent = 'FAIL';
@@ -596,17 +677,50 @@ ServiceInstance inst = svc
                 el.textContent = name.trim();
             }
         }
-        target.appendChild(el);
+    }
+
+    function callService(dispatcher, count, targetId) {
+        const target = document.getElementById(targetId);
+        const slots = [];
+        for (let i = 0; i < count; i++) {
+            const el = createPlaceholder();
+            target.appendChild(el);
+            slots.push(el);
+        }
+        for (let i = 0; i < count; i++) {
+            fetch('/call/' + dispatcher)
+                .then(r => r.text())
+                .then(name => fillSlot(slots[i], name, dispatcher))
+                .catch(() => fillSlot(slots[i], 'fail', dispatcher));
+        }
+    }
+
+    async function callServiceSequential(dispatcher, count, targetId) {
+        const target = document.getElementById(targetId);
+        const slots = [];
+        for (let i = 0; i < count; i++) {
+            const el = createPlaceholder();
+            target.appendChild(el);
+            slots.push(el);
+        }
+        for (let i = 0; i < count; i++) {
+            await fetch('/call/' + dispatcher)
+                .then(r => r.text())
+                .then(name => fillSlot(slots[i], name, dispatcher))
+                .catch(() => fillSlot(slots[i], 'fail', dispatcher));
+        }
     }
 
     function loadSong3Config() {
         fetch('/config/quarkus')
             .then(r => r.json())
             .then(cfg => {
-                const sdEl = document.getElementById('song3-sd');
-                const lbEl = document.getElementById('song3-lb');
-                if (sdEl) sdEl.textContent = cfg.sd;
-                if (lbEl) lbEl.textContent = cfg.lb;
+                ['song3', 'song4'].forEach(prefix => {
+                    const sdEl = document.getElementById(prefix + '-sd');
+                    const lbEl = document.getElementById(prefix + '-lb');
+                    if (sdEl) sdEl.textContent = cfg.sd;
+                    if (lbEl) lbEl.textContent = cfg.lb;
+                });
             })
             .catch(() => {});
     }
@@ -690,6 +804,26 @@ ServiceInstance inst = svc
     setInterval(pollConsulServices, 2000);
     pollConsulServices();
     loadSong3Config();
+
+    function fmt(ms) { return ms < 1 ? (ms * 1000).toFixed(2) + 'μs' : ms.toFixed(2) + 'ms'; }
+
+    function pollStorkMetrics() {
+        fetch('/metrics/stork')
+            .then(r => r.json())
+            .then(m => {
+                document.getElementById('m-disc-count').textContent  = m.discoveryCount ?? '—';
+                document.getElementById('m-disc-avg').textContent    = fmt(m.discoveryAvgMs ?? 0);
+                document.getElementById('m-disc-fail').textContent   = m.discoveryFailures ?? '—';
+                document.getElementById('m-instances').textContent   = m.instancesDiscovered ?? '—';
+                document.getElementById('m-sel-count').textContent   = m.selectionCount ?? '—';
+                document.getElementById('m-sel-avg').textContent     = fmt(m.selectionAvgMs ?? 0);
+                document.getElementById('m-sel-fail').textContent    = m.selectionFailures ?? '—';
+            })
+            .catch(() => {});
+    }
+
+    setInterval(pollStorkMetrics, 2000);
+    pollStorkMetrics();
 </script>
 </body>
 </html>

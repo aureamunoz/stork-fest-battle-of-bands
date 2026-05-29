@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-stork</artifactId>
         </dependency>
 
@@ -36,6 +40,15 @@
             <groupId>io.smallrye.stork</groupId>
             <artifactId>stork-service-discovery-consul</artifactId>
             <version>${stork.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye.stork</groupId>
+            <artifactId>stork-configuration-generator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye.stork</groupId>
+            <artifactId>stork-core</artifactId>
         </dependency>
 
         <!-- Stork Load Balancers -->
