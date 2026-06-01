@@ -24,7 +24,7 @@
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>999-SNAPSHOT</quarkus.platform.version>
-        <stork.version>2.7.10-SNAPSHOT</stork.version>
+        <stork.version>2.7.10</stork.version>
         <spring-boot.version>4.0.6</spring-boot.version>
     </properties>
 

@@ -9,19 +9,29 @@
 
 5. Start the UI (new terminal):
    ```
-   mvn quarkus:dev -pl ui -Ddebug=false
+   mvn quarkus:dev -pl ui 
    ```
    
 4. Start the Quarkus dispatcher (new terminal):
    ```
-   mvn quarkus:dev -pl dispatcher-quarkus -Ddebug=false
+   mvn quarkus:dev -pl dispatcher-quarkus 
    ```
 
-2. Start the first guitarist (Slash):
+   2. Start the first guitarist (Slash):
+      ```
+      mvn quarkus:dev -pl guitar-hero-service
+      ```
+      (Default: Slash, port 9000, 300ms delay)
+   Slash lo tengo que registrar manualmente en Consul porque quiero necesito registrarlo con tags y además mostrar la diferencia entre auto-registro 
+   y registro manual. Para eso, ejecuta este comando:
+    ```
+   curl -X PUT -d '{"ID": "Slash", "Name": "band-service", "Address": "localhost", "Port": 9000, "Tags": ["guns-n-roses","slash"]}' http://127.0.0.1:8500/v1/agent/service/register
    ```
-   mvn quarkus:dev -pl guitar-hero-service
+   Para arrancarlo, deshabilitar el auto-registro en el application.properties de guitar-hero-service:
+
    ```
-   (Default: Slash, port 9000, 300ms delay)
+      mvn quarkus:dev -pl guitar-hero-service -Dquarkus.stork.band-service.service-registrar.enable=false
+      ```
 
 7. (Optional) Start more guitarists to see them appear in real time:
    ```
