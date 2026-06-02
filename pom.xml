@@ -12,6 +12,7 @@
 
     <modules>
         <module>guitar-hero-quarkus-service</module>
+        <module>guitar-hero-standalone-service</module>
         <module>dispatcher-quarkus</module>
         <module>dispatcher-spring</module>
         <module>ui</module>
