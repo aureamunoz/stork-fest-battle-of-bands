@@ -58,7 +58,7 @@ You can also view the Consul UI directly at http://localhost:8500.
 
 Registering Slash with tags directoy on Consul API
 ```bash
-curl -X PUT -d '{"ID": "Slash", "Name": "band-service", "Address": "localhost", "Port": 9000, "Tags": ["guns-n-roses","slash"]}' http://127.0.0.1:8500/v1/agent/service/register
+curl -X PUT -d '{"ID": "Slash", "Name": "band-service", "Address": "localhost", "Port": 9000, "Tags": ["guns-n-roses","hard-rock"]}' http://127.0.0.1:8500/v1/agent/service/register
 ```
 `
 

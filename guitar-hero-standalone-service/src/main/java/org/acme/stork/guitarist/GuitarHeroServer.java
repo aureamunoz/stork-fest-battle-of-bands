@@ -4,6 +4,7 @@ import io.smallrye.stork.Stork;
 import io.vertx.mutiny.core.Vertx;
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import java.util.List;
 import java.util.Random;
 
 public class GuitarHeroServer {
@@ -38,7 +39,7 @@ public class GuitarHeroServer {
 
         Stork.initialize();
         Stork.getInstance().getService("band-service")
-                .registerInstance("band-service", name, "localhost", port)
+                .registerInstance(name, List.of("guns-n-roses", "hard-rock"), "localhost", port)
                 .await().indefinitely();
 
         System.out.println(name + " registered in Consul");
