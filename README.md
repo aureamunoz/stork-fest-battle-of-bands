@@ -57,7 +57,17 @@
 You can also view the Consul UI directly at http://localhost:8500.
 
 Registering Slash with tags directoy on Consul API
+```bash
 curl -X PUT -d '{"ID": "Slash", "Name": "band-service", "Address": "localhost", "Port": 9000, "Tags": ["guns-n-roses","slash"]}' http://127.0.0.1:8500/v1/agent/service/register
+```
+`
+
+Deleting a service instance
+
+```bash
+curl -X PUT http://127.0.0.1:8500/v1/agent/service/deregister/Slash
+```
+
 
 
 mvn spring-boot:run -pl dispatcher-spring

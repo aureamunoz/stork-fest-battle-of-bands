@@ -237,6 +237,12 @@
             <h2 style="margin-top: 0.1em; margin-bottom: 0.2em;">Battle of the Bands</h2>
             <p style="margin-bottom: 0.2em;">SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
             <p style="font-size: 0.6em; margin-top: 0.8em;">Áurea Muñoz for Commit Conf 2026</p>
+            <aside class="notes">
+                Bienvenidos a Stork Fest Battle of the Bands. Hoy vamos a hablar de un problema que todos los que trabajamos con microservicios conocemos bien:
+                cómo descubrir servicios y distribuir la carga entre ellos de forma inteligente. Y lo vamos a hacer de una forma un poco diferente —
+                con guitarristas, bandas y mucho rock. La herramienta protagonista es SmallRye Stork, una librería ligera de service discovery y client-side load balancing.
+                Vamos allá.
+            </aside>
         </section>
 
         <!-- ============== Who Am I ============== -->
@@ -266,6 +272,10 @@
                     </div>
                 </div>
             </div>
+            <aside class="notes">
+                Soy Áurea Muñoz, Principal Software Engineer en IBM. Soy Java Champion y co-lidero el Madrid JUG. Trabajo en el equipo de Quarkus y contribuyo a proyectos
+                del ecosistema SmallRye, entre ellos Stork, que es de lo que vamos a hablar hoy.
+            </aside>
         </section>
         <section>
             <h2 >The problem</h2>
@@ -273,13 +283,33 @@
                 <img src="/images/theproblem.png" alt="The problem"
                      style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
+            <aside class="notes">
+                En un entorno de microservicios, los servicios son efímeros. Se crean, se destruyen, se escalan. Las IPs cambian constantemente.
+                Ya no podemos hardcodear las direcciones de los servicios como hacíamos en el mundo monolítico.
+                Necesitamos dos cosas: primero, un mecanismo para descubrir dónde están los servicios en cada momento — eso es service discovery.
+                Y segundo, una forma inteligente de decidir a cuál de las instancias disponibles enviamos cada petición — eso es load balancing.
+                Tradicionalmente esto se ha resuelto con proxies en el lado del servidor, como un Kubernetes Service o un balanceador de carga externo.
+                Pero hay otra opción: hacerlo en el lado del cliente.
+            </aside>
         </section>
 
         <section>
             <h2>The solution</h2>
+            <ul>
+                <li class="fragment">A Quarkus integration, but Stork can be used also standalone</li>
+                <li class="fragment">Built-in support for Consul, Kubernetes, Eureka and more.</li>
+                <li class="fragment">Extensible service discovery mechanisms and  client load-balancing strategies</li>
+                <li class="fragment">A programmatic API and a managed approach</li>
+            </ul>
             <div style="display: flex; justify-content: center;">
                 <img src="/images/thesolution.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
+            <aside class="notes">
+                Y aquí es donde entra SmallRye Stork. Stork es una framework de service discovery y client-side load balancing para aplicaciones Java.
+                Es parte del ecosistema SmallRye y se integra de forma nativa con Quarkus, aunque como veremos hoy, también funciona con Spring Boot.
+                La idea es sencilla: en lugar de que un proxy externo decida a qué instancia va cada petición, es tu propia aplicación la que descubre las instancias disponibles
+                y elige la mejor. Esto te da más control, más flexibilidad y la posibilidad de implementar estrategias de discovery y balanceo personalizadas.
+            </aside>
         </section>
 
         <section>
@@ -287,6 +317,15 @@
             <div style="display: flex; justify-content: center;">
                 <img src="/images/concepts.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
+            <aside class="notes">
+                Los dos conceptos clave de Stork son estos. Primero, Service Discovery: el proceso de encontrar las instancias disponibles de un servicio.
+                Stork soporta múltiples proveedores — Consul, Eureka, Kubernetes, o una lista estática.
+                Segundo, Load Balancing: una vez que tenemos la lista de instancias, ¿a cuál le enviamos la petición? Stork incluye varias estrategias: round-robin, random, least-requests, power-of-two-choices, least-response-time y sticky. Y si ninguna te encaja, puedes crear la tuya propia.
+
+                A nivel programático, el proceso para usar Stork es el siguiente: primero obtenemos la instancia singleton de Stork, que viene configurada con un conjunto de servicios que va a gestionar — lo que llamamos definiciones de servicio. A continuación, tomamos el servicio que nos interese por su nombre. Y por último, obtenemos la ServiceInstance, que nos proporciona los datos necesarios — host, puerto, metadata — para acceder al servicio real.
+                Stork propone un API que os permite registrar estas definiciones de servicio y hacer búsqueda y selección de instancias de forma manual.
+                Pero si usáis Stork con un framework como Quarkus, todo este proceso está oculto — el framework se encarga de todo.
+            </aside>
         </section>
 
         <section>
@@ -294,12 +333,22 @@
             <div style="display: flex; justify-content: center;">
                 <img src="/images/quarkus-stork.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
+            <aside class="notes">
+                En Quarkus, la integración con Stork es completamente transparente.
+                Usas un REST client normal, pero en lugar de poner una URL fija, pones stork://nombre-del-servicio. Quarkus intercepta esa llamada, usa Stork para descubrir
+                las instancias, elige una según la estrategia de load balancing configurada, y envía la petición. Todo esto sin que tengas que escribir ni una línea de código
+                de infraestructura. Solo configuración en application.properties.
+            </aside>
         </section>
 
         <section>
             <h1>
                 <img src="/images/demo.png" alt="Demo" style="max-width: 60%; max-height: 60vh;">
             </h1>
+            <aside class="notes">
+                Bueno, basta de teoría. Vamos a ver todo esto en acción con una demo en vivo. He preparado un escenario que he llamado "Battle of the Bands"
+                una batalla de grupos donde nuestros servicios son guitarristas.
+            </aside>
         </section>
 
         <section>
@@ -307,6 +356,14 @@
             <div style="display: flex; justify-content: center;">
                 <img src="/images/guitar-hero-app.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
+            <aside class="notes">
+                Esta es la arquitectura de nuestra demo. Tenemos varios servicios "guitarrista" — Slash, Hendrix y Eddie Van Halen.
+                Cada uno simula un comportamiento diferente: Slash responde en 300ms y es 100% fiable.
+                Hendrix es más lento, 500ms, pero también fiable. Y Eddie es rapidísimo, solo 5ms, pero tiene un 20% de probabilidad de fallar, como buen rockero.
+                Estos servicios se registran automáticamente en Consul.
+                Luego tenemos un dispatcher que usa Stork para descubrirlos y balancear la carga entre ellos.
+                Y una UI que nos permite lanzar peticiones y ver visualmente qué guitarrista responde a cada una.
+            </aside>
         </section>
 
         <!-- ============== AGENDA ============== -->
@@ -320,6 +377,12 @@
                 <li><span class="highlight-green">Song 5</span> — Two Stages, One Band <span style="font-size:0.7em">(Quarkus + Spring Boot)</span></li>
                 <li><span class="highlight-blue">Song 6</span> — The Encore <span style="font-size:0.7em">(Observability)</span></li>
             </ul>
+            <aside class="notes">
+                He preparado 6 "canciones"/escenarios cada una demuestra una capacidad diferente de Stork.
+                Empezamos con auto-registration, luego service discovery con caché, después comparamos las distintas estrategias de load balancing,
+                creamos un load balancer personalizado, demostramos que Stork funciona igual en Quarkus y en Spring Boot, y terminamos con observabilidad y métricas.
+                Vamos con la primera.
+            </aside>
         </section>
 
         <!-- ============== SONG 1: PLUG & PLAY ============== -->
@@ -339,6 +402,9 @@ quarkus.stork.band-service.service-registrar.type=consul
 quarkus.stork.band-service.service-registrar.consul-host=localhost
 quarkus.stork.band-service.service-registrar.consul-port=8500
                 </code></pre>
+                <aside class="notes">
+                    Song 1: Plug and Play. La primera capacidad que vamos a ver es el auto-registration. Tradicionalmente, para registrar un servicio en Consul tenías que hacer un curl manualmente o escribir código específico. Con Stork, basta con añadir la dependencia stork-service-registration-consul y estas tres líneas de configuración. Cuando el servicio arranca, se registra automáticamente en Consul — zero code. Esto es posible gracias al mecanismo de SPI de Java: Stork descubre el registrar de Consul automáticamente en el classpath.
+                </aside>
             </section>
 
             <!-- Live demo slide -->
@@ -351,6 +417,9 @@ quarkus.stork.band-service.service-registrar.consul-port=8500
                         <p style="color:rgba(255,255,255,0.3); font-size:0.6em;">Waiting for services...</p>
                     </div>
                 </div>
+                <aside class="notes">
+                    DEMO: Ahora vamos a arrancar los servicios guitarrista uno a uno. Fijaos cómo aparecen automáticamente aquí en la UI conforme se registran en Consul. No estoy haciendo ningún curl ni registrando nada manualmente — cada servicio se auto-registra al arrancar. La UI está haciendo polling a Consul cada 2 segundos para mostrar los servicios disponibles. Arranco Slash... ahí está. Ahora Hendrix... y Eddie. Los tres registrados automáticamente.
+                </aside>
             </section>
         </section>
 
@@ -369,6 +438,9 @@ quarkus.stork.band-service.service-registrar.consul-port=8500
 quarkus.stork.band-service.service-discovery.type=consul
 quarkus.stork.band-service.service-discovery.consul-host=localhost
                 </code></pre>
+                <aside class="notes">
+                    Song 2: Service Discovery. Ahora que los servicios están registrados en Consul, vamos a ver cómo Stork los descubre. Configuramos el tipo de service discovery como "consul" y le damos el host. A partir de aquí, cada vez que nuestro dispatcher necesita llamar al servicio, Stork consulta Consul para obtener la lista de instancias disponibles. Pero hay un detalle importante: Stork cachea esa lista. No hace una llamada a Consul en cada petición — eso sería muy costoso. La caché se refresca periódicamente según el refresh-period configurado. Esto significa que si arrancamos un nuevo servicio, no aparecerá inmediatamente en el balanceo hasta que la caché se refresque.
+                </aside>
             </section>
 
             <!-- Live demo slide -->
@@ -388,6 +460,9 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                            It won't appear until the cache refreshes.</p>
                     </div>
                 </div>
+                <aside class="notes">
+                    DEMO: Vamos a lanzar 10 llamadas concurrentes. Fijaos cómo se distribuyen entre los tres guitarristas. Estamos usando round-robin, que es la estrategia por defecto, así que deberíais ver una distribución bastante equitativa: Slash, Hendrix, Eddie, Slash, Hendrix, Eddie... De vez en cuando veréis un FAIL en Eddie — es normal, tiene un 20% de probabilidad de error. Ahora probad a pensar: ¿qué pasa si arranco un cuarto guitarrista ahora mismo? No aparecerá inmediatamente porque la caché de Stork no se ha refrescado todavía. Tendremos que esperar al refresh-period.
+                </aside>
             </section>
         </section>
 
@@ -405,6 +480,9 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                     <li class="fragment"><code>least-response-time</code> — time-weighted scoring</li>
                     <li class="fragment"><code>sticky</code> — session affinity with failure backoff</li>
                 </ul>
+                <aside class="notes">
+                    Song 3: Battle of Strategies. Stork viene con 6 estrategias de load balancing incluidas. Round-robin ya lo hemos visto — distribuye secuencialmente. Random es probabilístico, a veces se acumula. Least-requests envía al que tenga menos peticiones en vuelo — ideal para servicios con tiempos de respuesta variables. Power-of-two-choices es muy interesante: elige dos instancias al azar y se queda con la que tenga menos carga. Es un algoritmo que da un balanceo sorprendentemente bueno con muy poco overhead. Least-response-time tiene en cuenta el tiempo de respuesta histórico y penaliza los errores — debería favorecer a Eddie por ser rápido, pero penalizarle por sus fallos. Y sticky mantiene afinidad con la misma instancia hasta que falla.
+                </aside>
             </section>
 
             <!-- Live demo slide -->
@@ -420,6 +498,9 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                     <button class="demo-btn demo-btn-light" onclick="clearResults('song3-results')">Clear</button>
                     <div id="song3-results" class="result-grid"></div>
                 </div>
+                <aside class="notes">
+                    DEMO: Aquí podemos ver la estrategia activa arriba. Vamos a lanzar 20 peticiones y observar la distribución. Con round-robin veréis una distribución uniforme. Para cambiar de estrategia hay que modificar el application.properties del dispatcher y reiniciar — pero la idea es que podéis ver cómo cada estrategia produce una distribución diferente. Con least-response-time, por ejemplo, veréis que Eddie domina al principio por ser rápido, pero cuando falla, su puntuación baja y Stork empieza a favorecer a Slash y Hendrix.
+                </aside>
             </section>
         </section>
 
@@ -463,6 +544,9 @@ public ServiceInstance selectServiceInstance(
                 <pre class="fragment"><code class="language-properties" data-trim>
 quarkus.stork.band-service.load-balancer.type=custom-load-balancer
                 </code></pre>
+                <aside class="notes">
+                    Song 4: Guns n Roses. ¿Y si ninguna de las estrategias incluidas te sirve? Puedes crear la tuya propia. Es muy sencillo: implementas la interfaz LoadBalancer con tu lógica de selección, creas un LoadBalancerProvider anotado con @LoadBalancerType y le das un nombre — en nuestro caso "custom-load-balancer". Stork lo descubre automáticamente vía SPI, sin configuración extra. En este ejemplo, nuestro custom load balancer busca la instancia que tenga el label "guns-n-roses" — es decir, siempre selecciona a Slash, que es el guitarrista de Guns n Roses. Es un ejemplo simple, pero imaginad un load balancer que seleccione por zona geográfica, por versión del servicio, o por cualquier metadato que asociéis a vuestras instancias.
+                </aside>
             </section>
 
             <!-- Live demo slide -->
@@ -478,6 +562,9 @@ quarkus.stork.band-service.load-balancer.type=custom-load-balancer
                     <button class="demo-btn demo-btn-light" onclick="clearResults('song4-results')">Clear</button>
                     <div id="song4-results" class="result-grid"></div>
                 </div>
+                <aside class="notes">
+                    DEMO: Para esta demo he cambiado la configuración del dispatcher a custom-load-balancer y he registrado a Slash en Consul con el tag "guns-n-roses". Ahora, cuando lance peticiones, todas deberían ir a Slash — no importa cuántas instancias haya. Fijaos: 20 peticiones, todas Slash. El custom load balancer ignora a Hendrix y Eddie porque no tienen el label. Esto demuestra lo fácil que es extender Stork con lógica de negocio propia.
+                </aside>
             </section>
         </section>
 
@@ -507,6 +594,9 @@ ServiceInstance inst = svc
   .selectInstance().await()...;
                     </code></pre>
                 </div>
+                <aside class="notes">
+                    Song 5: Two Stages, One Band. Una de las cosas que hace especial a Stork es que no es exclusivo de Quarkus. Es una librería Java standalone que funciona con cualquier framework. Para demostrarlo, hemos montado dos dispatchers: uno con Quarkus y otro con Spring Boot. Ambos usan la misma configuración de Stork, los mismos guitarristas registrados en Consul. La diferencia está en cómo se integra. En Quarkus es declarativo: pones stork:// en el baseUri del REST client y ya está. En Spring Boot es programático: llamas a Stork.getService(), seleccionas la instancia y haces la llamada HTTP tú mismo con RestTemplate. El resultado es el mismo, pero la experiencia de desarrollo es diferente. Quarkus te abstrae más; Spring te da más control explícito.
+                </aside>
             </section>
 
             <!-- Live demo slide -->
@@ -526,6 +616,9 @@ ServiceInstance inst = svc
                         </div>
                     </div>
                 </div>
+                <aside class="notes">
+                    DEMO: Vamos a lanzar 10 peticiones en ambos stages a la vez. A la izquierda veréis los resultados del dispatcher Quarkus, a la derecha los del dispatcher Spring Boot. Ambos están usando round-robin contra los mismos tres guitarristas en Consul. Fijaos que la distribución es similar en ambos — misma lógica de Stork, diferente framework. Esto es clave: si tu organización tiene proyectos en Quarkus y en Spring Boot, podéis usar Stork en ambos con la misma configuración y las mismas garantías.
+                </aside>
             </section>
         </section>
 
@@ -541,6 +634,9 @@ ServiceInstance inst = svc
                     <li class="fragment">Error rates per instance</li>
                     <li class="fragment">Prometheus + Grafana compatible</li>
                 </ul>
+                <aside class="notes">
+                    Song 6: The Encore — Observabilidad. De nada sirve tener service discovery y load balancing si no podemos observar cómo se comportan. Stork se integra con Micrometer, que es el estándar de métricas en el ecosistema Java. Con una sola línea de configuración — quarkus.micrometer.binder.stork.enabled=true — obtenemos métricas automáticas de todo el flujo. Cuántas veces se ha invocado el service discovery, cuánto tarda de media, cuántos errores ha habido. Lo mismo para el load balancer: cuántas selecciones, duración media, fallos. Estas métricas se exponen en formato Prometheus, así que podéis conectar directamente con Grafana para tener dashboards en tiempo real.
+                </aside>
             </section>
 
             <section class="demo-slide">
@@ -594,6 +690,9 @@ ServiceInstance inst = svc
                 <p style="font-size:0.45em; text-align:center; margin-top:1rem; opacity:0.5;">
                     actualizando cada 2s · fuente: /q/metrics (Micrometer + Prometheus)
                 </p>
+                <aside class="notes">
+                    DEMO: Vamos a lanzar unas cuantas peticiones y observar las métricas en tiempo real. Arriba vemos los resultados de las llamadas, y abajo los dos paneles de métricas. A la izquierda, Service Discovery: fijaos en el número de calls y la duración media. La primera llamada tarda más porque es cuando Stork realmente consulta Consul. Las siguientes usan la caché, así que la duración baja drásticamente. A la derecha, Load Balancer Selection: aquí vemos cuántas selecciones se han hecho y cuánto tarda el algoritmo de balanceo. Es casi instantáneo — microsegundos. Fijaos también en los fallos: si Eddie falla, el contador de selection failures sube. Estas métricas son las que luego podríais monitorizar en producción con Grafana para detectar problemas antes de que impacten a los usuarios.
+                </aside>
             </section>
         </section>
 
@@ -601,6 +700,9 @@ ServiceInstance inst = svc
         <section>
             <h1>Thank you!</h1>
             <p style="font-size:0.7em; margin-top:1em;">SmallRye Stork — <a href="https://smallrye.io/smallrye-stork">smallrye.io/smallrye-stork</a></p>
+            <aside class="notes">
+                Y con esto terminamos nuestro Stork Fest. Hemos visto cómo Stork simplifica el service discovery y el load balancing en aplicaciones Java. Auto-registration sin código, service discovery con caché inteligente, seis estrategias de balanceo incluidas, extensibilidad total con custom load balancers, soporte para Quarkus y Spring Boot, y observabilidad integrada con Micrometer. Todo esto con una configuración mínima y sin acoplamiento al framework. Si queréis probarlo, toda la documentación está en smallrye.io/smallrye-stork. Y el código de esta demo está disponible en mi GitHub. Muchas gracias, y si tenéis preguntas, estoy por aquí.
+            </aside>
         </section>
 
     </div>
@@ -609,6 +711,7 @@ ServiceInstance inst = svc
 <script src="/reveal.js/dist/reveal.js"></script>
 <script src="/reveal.js/plugin/highlight/highlight.js"></script>
 <script src="/reveal.js/plugin/markdown/markdown.js"></script>
+<script src="/reveal.js/plugin/notes/notes.js"></script>
 <script>
     Reveal.initialize({
         hash: true,
@@ -616,7 +719,7 @@ ServiceInstance inst = svc
         transition: 'slide',
         width: 1280,
         height: 720,
-        plugins: [RevealHighlight, RevealMarkdown]
+        plugins: [RevealHighlight, RevealMarkdown, RevealNotes]
     });
 
     // === Demo logic ===
