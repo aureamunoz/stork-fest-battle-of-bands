@@ -39,7 +39,7 @@ public class GuitarHeroServer {
 
         Stork.initialize();
         Stork.getInstance().getService("band-service")
-                .registerInstance(name, List.of("guns-n-roses", "hard-rock"), "localhost", port)
+                .registerInstance("Slash", List.of("guns-n-roses", "hard-rock"), "localhost", 9000)
                 .await().indefinitely();
 
         System.out.println(name + " registered in Consul");

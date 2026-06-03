@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -46,8 +47,10 @@ public class StageManagerResource {
     public Response callQuarkus() {
         try {
             return Response.ok(quarkusDispatcher.dispatch()).build();
-        } catch (Exception e) {
+        } catch (WebApplicationException e) {
             return Response.ok("FAIL").build();
+        } catch (Exception e) {
+            return Response.status(503).entity("DISPATCHER_DOWN").build();
         }
     }
 
@@ -57,8 +60,10 @@ public class StageManagerResource {
     public Response callSpring() {
         try {
             return Response.ok(springDispatcher.dispatch()).build();
-        } catch (Exception e) {
+        } catch (WebApplicationException e) {
             return Response.ok("FAIL").build();
+        } catch (Exception e) {
+            return Response.status(503).entity("DISPATCHER_DOWN").build();
         }
     }
 

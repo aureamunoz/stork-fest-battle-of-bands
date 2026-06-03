@@ -90,3 +90,32 @@ Solo esa línea:
 Cambia beige.css por cualquiera de los que te mencioné y refresca el navegador.
 
 
+Song 3 : demo service discovery
+
+1. Play sequential con 3 guitarristas arrancados → se ven los 3 alternándose (round-robin)
+2. Clear
+3. Arranca Flying V → enseña la guitarra flotante, Flying aparece en Consul
+4. Play sequential inmediatamente → solo salen los mismos 3, Flying no aparece. "¿Veis? Flying está en Consul pero Stork no lo sabe todavía — la caché no se ha refrescado"
+5. Espera ~10 segundos (con el refresh-period que tienes a 10s)
+6. Clear + Play sequential → ahora sí aparece Flying. "La caché se ha refrescado y Stork ha descubierto la nueva instancia"
+
+Song 4: demo load balancing
+
+
+
+Depende de la estrategia:
+
+| Estrategia               | Mejor con      | Por qué                                                                                                         |
+| ------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| **round-robin**          | Sequential     | Se ve el patrón 1-2-3-4-1-2-3-4 limpio                                                                          |
+| **random**               | Sequential     | Se aprecia la aleatoriedad sin ruido                                                                            |
+| **least-requests**       | **Concurrent** | Con sequential los contadores siempre están a 0 y no se ve la diferencia. Concurrent muestra cómo Eddie acapara |
+| **power-of-two-choices** | **Concurrent** | Mismo motivo — necesitas solapamiento para que la selección "2 al azar + menos carga" tenga sentido             |
+| **least-response-time**  | Sequential     | Se ve cómo Stork aprende de cada respuesta y va ajustando. Eddie domina, luego falla y Stork le penaliza        |
+| **sticky**               | Sequential     | Se ve claramente que todas van al mismo guitarrista, una tras otra                                              |
+
+En resumen: las que miden **carga en curso** (least-requests, power-of-two-choices) necesitan concurrent. Las que miden **historial** o siguen un **patrón fijo** (round-robin, least-response-time, sticky) se ven mejor con sequential.
+
+¿Quieres que añada esto como guía en las speaker notes de la demo?
+
+

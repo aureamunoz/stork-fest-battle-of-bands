@@ -236,7 +236,7 @@
             </h1>
             <h2 style="margin-top: 0.1em; margin-bottom: 0.2em;">Battle of the Bands</h2>
             <p style="margin-bottom: 0.2em;">SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
-            <p style="font-size: 0.6em; margin-top: 0.8em;">Áurea Muñoz for Commit Conf 2026</p>
+            <p style="font-size: 0.6em; margin-top: 0.8em;">Áurea Muñoz for   <img src="/images/commitconf.png" alt="Commit Conf 2026" style="height: 1.4em; vertical-align: middle;">2026</p>
             <aside class="notes">
                 Bienvenidos a Stork Fest Battle of the Bands. Hoy vamos a hablar de un problema que todos los que trabajamos con microservicios conocemos bien:
                 cómo descubrir servicios y distribuir la carga entre ellos de forma inteligente. Y lo vamos a hacer de una forma un poco diferente —
@@ -363,6 +363,8 @@
                 Hay una diferencia importante entre ellos: Slash es un servicio Java puro, sin framework — se registra en Consul programáticamente usando la API de Stork directamente. Los demás — Hendrix, Eddie y Flying V — son servicios Quarkus que aprovechan el auto-registro: basta con añadir la dependencia y la configuración, y se registran solos al arrancar. Esto nos va a permitir comparar ambos enfoques en la demo.
                 Luego tenemos el dispatcher — el componente que recibe las peticiones y usa Stork para descubrir los guitarristas disponibles y balancear la carga entre ellos. En realidad tenemos dos dispatchers: uno hecho con Quarkus, donde la integración con Stork es declarativa — pones stork:// en el REST client y ya está — y otro con Spring Boot, donde usamos la API de Stork directamente de forma programática. Ambos conectan contra el mismo Consul y los mismos guitarristas, así que podremos compararlos side by side más adelante.
                 Y por último, una interfaz web desde la que vamos a atacar al dipatcher que nos permite lanzar peticiones y ver visualmente qué guitarrista responde a cada una.
+
+                DEMO: abrir intellij y enseñar los diferentes módulos para que se vean las cajitas de la arquitectura.
             </aside>
         </section>
 
@@ -389,8 +391,8 @@
         <!-- ============== SONG 1: SOUNDCHECK ============== -->
         <section>
             <section class="demo-slide">
-                <h2 style="margin-bottom: 0.1em;"><span class="highlight-yellow">Song 1</span> — Soundcheck</h2>
-                <h3 style="margin-top: 0.1em; margin-bottom: 0.3em; font-size: 0.7em;"><span class="demo-label">Programmatic Registration</span></h3>
+                <h2 style="margin-bottom: 0.1em; margin-top: 0;"><span class="highlight-yellow">Song 1</span> — Soundcheck</h2>
+                <h3 style="margin-top: 0.1em; margin-bottom: 0.3em; font-size: 0.85em;"><span class="demo-label">Programmatic Registration</span></h3>
                 <ul style="font-size: 0.75em; margin-top: 0; margin-bottom: 0.3em;">
                     <li class="fragment">No framework needed — plain Java + Stork API</li>
                     <li class="fragment"><code>Stork.initialize()</code> to bootstrap</li>
@@ -404,7 +406,9 @@ Stork.getInstance()
     .registerInstance("Slash", List.of("guns-n-roses", "hard-rock"), "localhost", port)
     .await().indefinitely();
                 </code></pre>
-                <p class="fragment" style="font-size: 0.7em; margin: 0.3em 0 0.1em; text-align: left;">Config via MicroProfile Config (<code>application.properties</code>)</p>
+                <ul style="font-size: 0.75em; margin-top: 0; margin-bottom: 0.3em;">
+                    <li class="fragment">Config via MicroProfile Config (<code>application.properties</code>)</li>
+                </ul>
                 <pre class="fragment" style="font-size: 0.4em; margin: 0.2em auto;"><code class="language-properties" data-trim>
 # Stork — Consul registration
 stork.band-service.service-registrar.type=consul
@@ -412,10 +416,21 @@ stork.band-service.service-registrar.consul-host=localhost
 stork.band-service.service-registrar.consul-port=8500
                 </code></pre>
                 <aside class="notes">
-                    Song 1: Soundcheck. Antes de empezar con los frameworks, vamos a ver cómo funciona Stork en su forma más pura: sin Quarkus, sin Spring Boot, sin ningún framework.
-                    Solo Java y la API de Stork. Es un main() que levanta un servidor HTTP con Vert.x, inicializa Stork con Stork.initialize(), y luego llama a registerInstance() para registrarse en Consul.
-                    La configuración viene de un application.properties vía MicroProfile Config. Es el mismo mecanismo que usan los frameworks internamente, pero aquí lo vemos explícito.
+                    Song 1: Soundcheck.
+                    Antes de empezar con los frameworks, vamos a ver cómo funciona Stork en su forma más pura: sin Quarkus, sin Spring Boot, sin ningún framework.
+                    Solo Java y la API de Stork. Es un main() que levanta un servidor HTTP con Vert.x, inicializa Stork con Stork.initialize(), y luego llama a registerInstance() para
+                    registrarse en Consul. La configuración viene de un application.properties vía MicroProfile Config. Es el mismo mecanismo que usan los frameworks internamente, pero aquí lo vemos explícito.
+                    Sin esto, para registrar un servicio en Consul teníamos que hacer un curl manualmente contra la API de Consul, o escribir código específico usando un cliente como el Consul client de Vert.x. Funciona, pero no es muy ergonómico.
+                    Con Stork tenemos un API fluent mucho más friendly: Stork.initialize(), getService(), registerInstance() y ya está. Tres líneas y servicio está registrado.
+
+
+                        DEMO: Vamos a ver esto de verdad, abro IntelliJ, tengo aqui mi guitarrista. Mostrar el pom con las dependencias. Mostrar el servicio java en sí mismo.
+                        Mostrar el fichero properties con la configuracion.
+                        Abro terminal, lanzo el servicio con mvn exec:java y vamos a Consul... fijaos: Slash se ha registrado en Consul con el nombre "band-service", la IP de localhost y el puerto que le he dado.
+                        Esto es exactamente lo que hemos configurado en el código y en el properties.
+
                     Esto demuestra que Stork no depende de ningún framework — es una librería Java pura que podéis usar en cualquier contexto.
+
                 </aside>
             </section>
         </section>
@@ -438,7 +453,10 @@ quarkus.stork.band-service.service-registrar.consul-host=localhost
 quarkus.stork.band-service.service-registrar.consul-port=8500
                 </code></pre>
                 <aside class="notes">
-                    Song 2: Plug and Play. La primera capacidad que vamos a ver es el auto-registration. Tradicionalmente, para registrar un servicio en Consul tenías que hacer un curl manualmente o escribir código específico. Con Stork, basta con añadir la dependencia stork-service-registration-consul y estas tres líneas de configuración. Cuando el servicio arranca, se registra automáticamente en Consul — zero code. Esto es posible gracias al mecanismo de SPI de Java: Stork descubre el registrar de Consul automáticamente en el classpath.
+                    Song 2: Plug and Play. En la Song 1 hemos visto cómo registrar un servicio programáticamente con la API de Stork. Ahora vamos a ver el otro enfoque: el auto-registro declarativo.
+                    Nuestros guitarristas — Hendrix, Eddie y Flying V — son aplicaciones Quarkus. Y gracias a la integración de Quarkus con Stork, el registro en Consul puede ser completamente automático.
+                    Basta con añadir la dependencia stork-service-registration-consul y estas líneas de configuración (fijaos en el prefijo 'quarkus' de las properties)
+                    Cuando el servicio arranca, se registra automáticamente en Consul — zero code, zero llamadas manuales. Esto es posible gracias al mecanismo de SPI de Java: Stork descubre el registrar de Consul automáticamente en el classpath.
                 </aside>
             </section>
 
@@ -453,9 +471,12 @@ quarkus.stork.band-service.service-registrar.consul-port=8500
                     </div>
                 </div>
                 <aside class="notes">
-                    DEMO: Vamos a ver primero qué pasa si arranco un servicio sin configurar nada del registrar. Abro terminal, lanzo el servicio y vamos a Consul... fijaos: se ha registrado automáticamente con valores por defecto — el nombre del servicio es el del artefacto, la IP es la de la máquina. Stork detecta que tiene la dependencia de Consul en el classpath y se auto-registra sin necesitar ni una línea de configuración.
-                    Pero para nuestra demo necesitamos que todos los guitarristas se registren como "band-service" y con localhost como dirección, para que el dispatcher pueda descubrirlos como un pool. Así que añadimos la configuración explícita en application.properties: el nombre del servicio, la IP y el nombre de instancia.
-                    Ahora sí, vamos a arrancar los servicios uno a uno. Fijaos cómo aparecen automáticamente aquí en la UI conforme se registran en Consul. No estoy haciendo ningún curl ni registrando nada manualmente — cada servicio se auto-registra al arrancar. La UI está haciendo polling a Consul cada 2 segundos para mostrar los servicios disponibles.
+                    DEMO: Vamos a verlo. Abro IntelliJ, tengo aquí mi guitarrista Quarkus. Enseño el pom con las dependencias — fijaos, solo tiene quarkus-rest y stork-service-registration-consul. El servicio Java en sí es un endpoint REST trivial que devuelve el nombre del guitarrista.
+                    Ahora viene lo interesante: ¿qué pasa si no configuro absolutamente nada del registrar? Comento la configuración de Stork en el properties y arranco el servicio.
+                    Abro terminal, lanzo el servicio y vamos a Consul... fijaos: se ha registrado automáticamente con valores por defecto. Quarkus y Stork han decidido por mí: el nombre de instancia es un ID interno que ha construido Stork, la dirección IP es la que ha detectado de la máquina, y el puerto es el de Quarkus. Zero configuración, zero código — solo por tener la dependencia en el classpath.
+                    Pero para nuestra demo necesitamos personalizar esos datos. Quiero que los guitarristas se registren como "band-service" para que el dispatcher pueda descubrirlos como un pool. Y quiero nombres friendly — Hendrix, Eddie, Flying V — en vez de IDs generados. Y localhost como IP para que el dispatcher pueda atacar los endpoints localmente.
+                    Así que descomento la configuración, pongo esos valores, y ahora sí: arranco los servicios uno a uno. Fijaos cómo aparecen automáticamente aquí en la UI conforme se registran en Consul. No estoy haciendo ningún curl ni registrando nada manualmente — cada servicio se auto-registra al arrancar. La UI está haciendo polling a Consul cada 2 segundos para mostrar los servicios disponibles.
+                    Por cierto, veis esta guitarra abajo a la izquierda? Si la pulsáis, en cualquier momento de la presentación podéis ver qué servicios están registrados en Consul ahora mismo. Es un monitor en tiempo real que nos va a ser útil en las próximas demos.
                 </aside>
             </section>
         </section>
@@ -463,20 +484,41 @@ quarkus.stork.band-service.service-registrar.consul-port=8500
         <!-- ============== SONG 3: SERVICE DISCOVERY ============== -->
         <section>
             <!-- Explanation slide -->
-            <section>
-                <h2><span class="highlight-blue">Song 3</span> — Service Discovery</h2>
-                <h3><span class="demo-label">Consul discovery with instance caching</span></h3>
-                <ul>
+            <section class="demo-slide">
+                <h2 style="margin-bottom: 0; margin-top: 0;"><span class="highlight-blue">Song 3</span> — Service Discovery</h2>
+                <h3 style="margin-top: 0; margin-bottom: 0.2em; font-size: 0.85em;"><span class="demo-label">Consul discovery with instance caching</span></h3>
+                <ul style="font-size: 0.7em; margin-top: 0; margin-bottom: 0.1em;">
                     <li class="fragment">Stork discovers instances from Consul</li>
+                </ul>
+                <pre class="fragment" style="font-size: 0.38em; margin: 0.1em auto;"><code class="language-properties" data-trim>
+quarkus.stork.band-service.service-discovery.type=consul
+quarkus.stork.band-service.service-discovery.consul-host=localhost
+quarkus.stork.band-service.service-registrar.consul-port=8500
+                </code></pre>
+                <pre class="fragment" style="font-size: 0.38em; margin: 0.1em auto;"><code class="language-java" data-trim>
+@Path("/")
+@RegisterRestClient(baseUri = "stork://band-service")
+public interface BandClient {
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    String play();
+}
+                </code></pre>
+                <ul style="font-size: 0.7em; margin-top: 0.1em; margin-bottom: 0.1em;">
                     <li class="fragment"><strong>Caches</strong> the list — no network call per request</li>
                     <li class="fragment">Cache refreshes every <code>refresh-period</code> (default: 5 min)</li>
                 </ul>
-                <pre class="fragment"><code class="language-properties" data-trim>
-quarkus.stork.band-service.service-discovery.type=consul
-quarkus.stork.band-service.service-discovery.consul-host=localhost
+                <pre class="fragment" style="font-size: 0.38em; margin: 0.1em auto;"><code class="language-properties" data-trim>
+quarkus.stork.band-service.service-discovery.refresh-period=10S
                 </code></pre>
                 <aside class="notes">
-                    Song 3: Service Discovery. Ahora que los servicios están registrados en Consul, vamos a ver cómo Stork los descubre. Configuramos el tipo de service discovery como "consul" y le damos el host. A partir de aquí, cada vez que nuestro dispatcher necesita llamar al servicio, Stork consulta Consul para obtener la lista de instancias disponibles. Pero hay un detalle importante: Stork cachea esa lista. No hace una llamada a Consul en cada petición — eso sería muy costoso. La caché se refresca periódicamente según el refresh-period configurado. Esto significa que si arrancamos un nuevo servicio, no aparecerá inmediatamente en el balanceo hasta que la caché se refresque.
+                    Song 3: Service Discovery. Ahora que los servicios están registrados en Consul, vamos a ver cómo Stork los descubre.
+                    Configuramos el tipo de service discovery como "consul" y le damos el host y el port.
+                    Fijaos en el snippet de Java: nuestro dispatcher usa un REST client con baseUri "stork://band-service". Ese prefijo stork:// es la clave — cuando Quarkus ve esa URI, intercepta la llamada y delega en Stork para descubrir las instancias disponibles del servicio "band-service" y seleccionar una.
+                    Es completamente transparente para el código del dispatcher: él solo llama a play() y Stork se encarga del resto.
+                    Hay otro detalle importante: Stork cachea la lista de instancias. No hace una llamada a Consul en cada petición — eso sería muy costoso.
+                    La caché se refresca periódicamente según el refresh-period configurado.
+                    Esto significa que si arrancamos un nuevo servicio, no aparecerá inmediatamente en el balanceo hasta que la caché se refresque.
                 </aside>
             </section>
 
@@ -485,7 +527,6 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                 <h3>Song 3 — <span class="demo-label">Live Demo</span></h3>
                 <div class="two-columns">
                     <div class="demo-panel">
-                        <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 10, 'song3-results')">Play concurrent (round-robin)</button>
                         <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 10, 'song3-results')">Play 10 sequential (round-robin)</button>
                         <button class="demo-btn demo-btn-light" onclick="clearResults('song3-results')">Clear</button>
                         <div id="song3-results" class="result-grid"></div>
@@ -498,7 +539,7 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                     </div>
                 </div>
                 <aside class="notes">
-                    DEMO: Vamos a lanzar 10 llamadas concurrentes. Fijaos cómo se distribuyen entre los tres guitarristas. Estamos usando round-robin, que es la estrategia por defecto, así que deberíais ver una distribución bastante equitativa: Slash, Hendrix, Eddie, Slash, Hendrix, Eddie... De vez en cuando veréis un FAIL en Eddie — es normal, tiene un 20% de probabilidad de error. Ahora probad a pensar: ¿qué pasa si arranco un cuarto guitarrista ahora mismo? No aparecerá inmediatamente porque la caché de Stork no se ha refrescado todavía. Tendremos que esperar al refresh-period.
+                    DEMO: Vamos a lanzar 10 llamadas secuenciales. Fijaos cómo se distribuyen entre los tres guitarristas. Estamos usando round-robin, que es la estrategia por defecto, así que deberíais ver una distribución bastante equitativa: Slash, Hendrix, Eddie, Slash, Hendrix, Eddie... De vez en cuando veréis un FAIL en Eddie — es normal, tiene un 20% de probabilidad de error. Ahora probad a pensar: ¿qué pasa si arranco un cuarto guitarrista ahora mismo? No aparecerá inmediatamente porque la caché de Stork no se ha refrescado todavía. Tendremos que esperar al refresh-period.
                 </aside>
             </section>
         </section>
@@ -518,7 +559,7 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                     <li class="fragment"><code>sticky</code> — session affinity with failure backoff</li>
                 </ul>
                 <aside class="notes">
-                    Song 4: Battle of Strategies. Stork viene con 6 estrategias de load balancing incluidas. Round-robin ya lo hemos visto — distribuye secuencialmente. Random es probabilístico, a veces se acumula. Least-requests envía al que tenga menos peticiones en vuelo — ideal para servicios con tiempos de respuesta variables. Power-of-two-choices es muy interesante: elige dos instancias al azar y se queda con la que tenga menos carga. Es un algoritmo que da un balanceo sorprendentemente bueno con muy poco overhead. Least-response-time tiene en cuenta el tiempo de respuesta histórico y penaliza los errores — debería favorecer a Eddie por ser rápido, pero penalizarle por sus fallos. Y sticky mantiene afinidad con la misma instancia hasta que falla.
+                    Song 4: Battle of Strategies. Stork viene con 6 estrategias de load balancing incluidas. Round-robin y random son las más simples: una distribuye secuencialmente, la otra aleatoriamente. Las demás — least-requests, power-of-two-choices, least-response-time y sticky — monitorizan las invocaciones y toman decisiones más inteligentes. Vamos a verlas en acción con nuestros guitarristas.
                 </aside>
             </section>
 
@@ -536,7 +577,13 @@ quarkus.stork.band-service.service-discovery.consul-host=localhost
                     <div id="song4-results" class="result-grid"></div>
                 </div>
                 <aside class="notes">
-                    DEMO: Aquí podemos ver la estrategia activa arriba. Vamos a lanzar 20 peticiones y observar la distribución. Con round-robin veréis una distribución uniforme. Para cambiar de estrategia hay que modificar el application.properties del dispatcher y reiniciar — pero la idea es que podéis ver cómo cada estrategia produce una distribución diferente. Con least-response-time, por ejemplo, veréis que Eddie domina al principio por ser rápido, pero cuando falla, su puntuación baja y Stork empieza a favorecer a Slash y Hendrix.
+                    DEMO: Arriba vemos la estrategia activa. Para cambiar de estrategia modificamos el application.properties del dispatcher y reiniciamos.
+                    Round-robin: lanzamos 20 peticiones y vemos distribución uniforme — Slash, Hendrix, Eddie, Flying, Slash, Hendrix... uno a uno.
+                    Random: distribución aleatoria, a veces se acumula en uno.
+                    Least-requests: esta ya monitoriza. Cada vez que Stork selecciona una instancia, incrementa un contador de llamadas en curso para esa instancia. Cuando la llamada termina — da igual si con éxito o error — el contador se decrementa. Así, en cada selección, Stork elige la instancia con el contador más bajo. Si lanzamos sequential, siempre elige la misma porque cada llamada termina antes de que empiece la siguiente, así que todos los contadores están a 0. Pero si lanzamos concurrent, ¡aquí sí se nota! Las llamadas se solapan, los contadores suben, y Eddie — que responde en 5ms — libera su slot mucho antes que Hendrix con sus 500ms. Resultado: Eddie acumula más selecciones porque su contador baja más rápido.
+                    Power-of-two-choices: en vez de recorrer todas las instancias como least-requests, elige solo dos al azar y se queda con la que tenga menos carga. Más eficiente cuando hay muchas instancias — el tradeoff es que puede elegir las dos más ocupadas, pero estadísticamente da muy buen resultado.
+                    Least-response-time: lleva la cuenta de tiempos de respuesta y fallos. Eddie es el más rápido con 5ms, pero tiene un 20% de fallos — y cada fallo le añade una penalización al score. Resultado: tras unas pocas llamadas, Flying acaba dominando porque es la mejor combinación de velocidad (200ms) y fiabilidad (0% fallos). No basta con ser rápido, tienes que ser fiable — ese es el punto fuerte de esta estrategia.
+                    Sticky: todas las peticiones van al mismo guitarrista. Lanzamos 20 y salen todas del mismo. Si paramos ese servicio, Stork detecta el fallo y conmuta al siguiente disponible — útil para escenarios con sesión donde quieres afinidad con el backend.
                 </aside>
             </section>
         </section>
@@ -619,16 +666,13 @@ quarkus.stork.band-service.load-balancer.type=custom-load-balancer
                 <div class="two-columns fragment" style="font-size:0.7em; margin-top:1em;">
                     <pre><code class="language-java" data-trim>
 // Quarkus — declarative
-@RegisterRestClient(
-  baseUri = "stork://band-service")
+@RegisterRestClient(baseUri = "stork://band-service")
 public interface BandClient { ... }
                     </code></pre>
                     <pre><code class="language-java" data-trim>
 // Spring Boot — programmatic
-Service svc = stork
-  .getService("band-service");
-ServiceInstance inst = svc
-  .selectInstance().await()...;
+Service svc = stork.getService("band-service");
+ServiceInstance inst = svc.selectInstance().await()...;
                     </code></pre>
                 </div>
                 <aside class="notes">
@@ -679,10 +723,9 @@ ServiceInstance inst = svc
             <section class="demo-slide">
                 <h3>Song 7 — <span class="demo-label">Live Demo</span></h3>
                 <div style="margin-bottom:0.8rem;">
-                    <button class="demo-btn demo-btn-primary" onclick="callService('quarkus', 20, 'song7-results')">Fire 20 concurrent</button>
-                    <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 20, 'song7-results')">Fire 20 sequential</button>
+                    <button class="demo-btn demo-btn-primary" onclick="callServiceSequential('quarkus', 10, 'song7-results')">Play 10 sequential</button>
                     <button class="demo-btn demo-btn-light" onclick="clearResults('song7-results')">Clear</button>
-                    <div id="song7-results" class="result-grid" style="max-height:80px;"></div>
+                    <div id="song7-results" class="result-grid" style="max-height:250px;"></div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem;">
                     <div class="demo-panel">
@@ -728,7 +771,11 @@ ServiceInstance inst = svc
                     actualizando cada 2s · fuente: /q/metrics (Micrometer + Prometheus)
                 </p>
                 <aside class="notes">
-                    DEMO: Vamos a lanzar unas cuantas peticiones y observar las métricas en tiempo real. Arriba vemos los resultados de las llamadas, y abajo los dos paneles de métricas. A la izquierda, Service Discovery: fijaos en el número de calls y la duración media. La primera llamada tarda más porque es cuando Stork realmente consulta Consul. Las siguientes usan la caché, así que la duración baja drásticamente. A la derecha, Load Balancer Selection: aquí vemos cuántas selecciones se han hecho y cuánto tarda el algoritmo de balanceo. Es casi instantáneo — microsegundos. Fijaos también en los fallos: si Eddie falla, el contador de selection failures sube. Estas métricas son las que luego podríais monitorizar en producción con Grafana para detectar problemas antes de que impacten a los usuarios.
+                    DEMO: Fijaos en los contadores — probablemente ya tienen un número alto porque las métricas de Micrometer se acumulan durante toda la vida del proceso. Todo lo que hemos hecho en las Songs anteriores suma aquí. Si lanzo 10 llamadas más, veréis cómo el contador sube y la duración media se ajusta.
+                    Arriba vemos los resultados de las llamadas, y abajo los dos paneles de métricas. A la izquierda, Service Discovery: fijaos en el número de calls y la duración media. La primera llamada tarda más porque es cuando Stork realmente consulta Consul. Las siguientes usan la caché, así que la duración baja drásticamente. A la derecha, Load Balancer Selection: aquí vemos cuántas selecciones se han hecho y cuánto tarda el algoritmo de balanceo. Es casi instantáneo — microsegundos.
+                    Un detalle sobre los Failures: veréis que están a 0 aunque Eddie falle. Esto es porque estas métricas miden fallos en el proceso de Stork — en el discovery o en la selección de instancia. Cuando Eddie devuelve un 500, Stork hizo bien su trabajo: descubrió las instancias y seleccionó una correctamente. El fallo es a nivel HTTP, después de Stork. Estos contadores subirían si, por ejemplo, Consul estuviera caído y el discovery fallara, o si no hubiera ninguna instancia disponible para seleccionar.
+                    Estas métricas son las que luego podríais monitorizar en producción con Grafana para detectar problemas de infraestructura antes de que impacten a los usuarios.
+                    BONUS: Estas métricas también las podéis ver directamente en la Dev UI de Quarkus. Si abro el navegador en /q/dev-ui y voy a la sección de Extensions, ahí tenéis SmallRye Stork con un dashboard integrado que muestra el estado de los servicios, las instancias descubiertas y las métricas de discovery y selección — todo sin configurar nada extra.
                 </aside>
             </section>
         </section>
@@ -738,7 +785,7 @@ ServiceInstance inst = svc
             <h1>Thank you!</h1>
             <p style="font-size:0.7em; margin-top:1em;">SmallRye Stork — <a href="https://smallrye.io/smallrye-stork">smallrye.io/smallrye-stork</a></p>
             <aside class="notes">
-                Y con esto terminamos nuestro Stork Fest. Hemos visto cómo Stork simplifica el service discovery y el load balancing en aplicaciones Java. Auto-registration sin código, service discovery con caché inteligente, seis estrategias de balanceo incluidas, extensibilidad total con custom load balancers, soporte para Quarkus y Spring Boot, y observabilidad integrada con Micrometer. Todo esto con una configuración mínima y sin acoplamiento al framework. Si queréis probarlo, toda la documentación está en smallrye.io/smallrye-stork. Y el código de esta demo está disponible en mi GitHub. Muchas gracias, y si tenéis preguntas, estoy por aquí.
+                Y con esto terminamos nuestro Stork Fest. Si queréis probarlo, toda la documentación está en smallrye.io/smallrye-stork. Y el código de esta demo está disponible en mi GitHub. Muchas gracias, y si tenéis preguntas, estoy por aquí.
             </aside>
         </section>
 
@@ -795,7 +842,19 @@ ServiceInstance inst = svc
     function fillSlot(el, name, dispatcher = 'quarkus') {
         el.innerHTML = '';
         const key = name.trim().toLowerCase();
-        if (key === 'fail') {
+        if (key === 'down') {
+            el.className = 'result-item down';
+            const circle = document.createElement('div');
+            circle.className = 'slot-circle';
+            circle.style.background = 'rgba(255,0,0,0.15)';
+            circle.style.border = '3px solid #e74c3c';
+            circle.style.animation = 'none';
+            el.appendChild(circle);
+            const label = document.createElement('span');
+            label.textContent = 'DOWN';
+            label.style.color = '#e74c3c';
+            el.appendChild(label);
+        } else if (key === 'fail') {
             el.className = 'result-item fail';
             const img = document.createElement('img');
             img.src = failIcons[dispatcher] || failIcons['quarkus'];
@@ -818,6 +877,14 @@ ServiceInstance inst = svc
         }
     }
 
+    function handleResponse(r, slot, dispatcher) {
+        if (r.status === 503) {
+            fillSlot(slot, 'down', dispatcher);
+            return;
+        }
+        r.text().then(name => fillSlot(slot, name, dispatcher));
+    }
+
     function callService(dispatcher, count, targetId) {
         const target = document.getElementById(targetId);
         const slots = [];
@@ -828,8 +895,7 @@ ServiceInstance inst = svc
         }
         for (let i = 0; i < count; i++) {
             fetch('/call/' + dispatcher)
-                .then(r => r.text())
-                .then(name => fillSlot(slots[i], name, dispatcher))
+                .then(r => handleResponse(r, slots[i], dispatcher))
                 .catch(() => fillSlot(slots[i], 'fail', dispatcher));
         }
     }
@@ -844,8 +910,7 @@ ServiceInstance inst = svc
         }
         for (let i = 0; i < count; i++) {
             await fetch('/call/' + dispatcher)
-                .then(r => r.text())
-                .then(name => fillSlot(slots[i], name, dispatcher))
+                .then(r => handleResponse(r, slots[i], dispatcher))
                 .catch(() => fillSlot(slots[i], 'fail', dispatcher));
         }
     }

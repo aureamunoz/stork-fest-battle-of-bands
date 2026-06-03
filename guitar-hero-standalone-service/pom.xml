@@ -35,11 +35,6 @@
             <version>${stork.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.smallrye.stork</groupId>
-            <artifactId>stork-service-discovery-static-list</artifactId>
-            <version>${stork.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-core</artifactId>
         </dependency>
