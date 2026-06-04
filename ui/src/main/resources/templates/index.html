@@ -359,9 +359,10 @@
             </div>
             <aside class="notes">
                 Esta es la arquitectura de nuestra demo. Para el service registry vamos a usar Consul, aunque como hemos visto, Stork también soporta Eureka, Kubernetes y otros.
-                Tenemos cuatro servicios "guitarrista", cada uno con un comportamiento diferente: Slash responde en 300ms y es 100% fiable. Flying V también es fiable pero más rápido, unos 100ms. Hendrix es más lento, 500ms, aunque también fiable. Y Eddie es rapidísimo, solo 5ms, pero tiene un 20% de probabilidad de fallar, como buen rockero.
-                Hay una diferencia importante entre ellos: Slash es un servicio Java puro, sin framework — se registra en Consul programáticamente usando la API de Stork directamente. Los demás — Hendrix, Eddie y Flying V — son servicios Quarkus que aprovechan el auto-registro: basta con añadir la dependencia y la configuración, y se registran solos al arrancar. Esto nos va a permitir comparar ambos enfoques en la demo.
-                Luego tenemos el dispatcher — el componente que recibe las peticiones y usa Stork para descubrir los guitarristas disponibles y balancear la carga entre ellos. En realidad tenemos dos dispatchers: uno hecho con Quarkus, donde la integración con Stork es declarativa — pones stork:// en el REST client y ya está — y otro con Spring Boot, donde usamos la API de Stork directamente de forma programática. Ambos conectan contra el mismo Consul y los mismos guitarristas, así que podremos compararlos side by side más adelante.
+                Tenemos cuatro servicios "guitarrista", cada uno con un comportamiento diferente: Slash responde en 300ms y es 100% fiable.
+                Randy también es fiable pero más rápido, unos 100ms. Hendrix es más lento, 500ms, aunque también fiable. Y Eddie es rapidísimo, solo 5ms, pero tiene un 20% de probabilidad de fallar, como buen rockero.
+                Hay una diferencia importante entre ellos: Slash es un servicio Java puro, sin framework — se registra en Consul programáticamente usando la API de Stork directamente. Los demás — Hendrix, Eddie y Flying V — son servicios Quarkus que aprovechan el auto-registro: basta con añadir la dependencia y la configuración, y se registran solos al arrancar.
+                Luego tenemos el dispatcher, el componente que recibe las peticiones y delega en Stork para descubrir los guitarristas disponibles y balancear la carga entre ellos. En realidad tenemos dos dispatchers: uno hecho con Quarkus y otro con Spring Boot. Ambos conectan contra el mismo Consul y los mismos guitarristas, así que podremos compararlos.
                 Y por último, una interfaz web desde la que vamos a atacar al dipatcher que nos permite lanzar peticiones y ver visualmente qué guitarrista responde a cada una.
 
                 DEMO: abrir intellij y enseñar los diferentes módulos para que se vean las cajitas de la arquitectura.
@@ -783,7 +784,10 @@ ServiceInstance inst = svc.selectInstance().await()...;
         <!-- ============== CLOSING ============== -->
         <section>
             <h1>Thank you!</h1>
-            <p style="font-size:0.7em; margin-top:1em;">SmallRye Stork — <a href="https://smallrye.io/smallrye-stork">smallrye.io/smallrye-stork</a></p>
+            <p style="font-size:0.7em; margin-top:0.5em;">SmallRye Stork — <a href="https://smallrye.io/smallrye-stork">smallrye.io/smallrye-stork</a></p>
+            <div style="display: flex; justify-content: center; margin-top: 0.5em;">
+                <img src="/images/storkfest-qrcode.png" alt="QR Code" style="max-height: 30vh; border-radius: 8px;">
+            </div>
             <aside class="notes">
                 Y con esto terminamos nuestro Stork Fest. Si queréis probarlo, toda la documentación está en smallrye.io/smallrye-stork. Y el código de esta demo está disponible en mi GitHub. Muchas gracias, y si tenéis preguntas, estoy por aquí.
             </aside>
