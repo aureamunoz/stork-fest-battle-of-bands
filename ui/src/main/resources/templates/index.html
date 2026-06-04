@@ -236,7 +236,7 @@
             </h1>
             <h2 style="margin-top: 0.1em; margin-bottom: 0.2em;">Battle of the Bands</h2>
             <p style="margin-bottom: 0.2em;">SmallRye Stork: Service Discovery &amp; Client-Side Load Balancing</p>
-            <p style="font-size: 0.6em; margin-top: 0.8em;">Áurea Muñoz for   <img src="/images/commitconf.png" alt="Commit Conf 2026" style="height: 1.4em; vertical-align: middle;">2026</p>
+            <p style="font-size: 0.6em; margin-top: 0.8em; display: flex; align-items: center; justify-content: center; gap: 0.3em;">Áurea Muñoz for <img src="/images/commitconf.png" alt="Commit Conf 2026" style="height: 1.2em;"></p>
             <aside class="notes">
                 Bienvenidos a Stork Fest Battle of the Bands. Hoy vamos a hablar de un problema que todos los que trabajamos con microservicios conocemos bien:
                 cómo descubrir servicios y distribuir la carga entre ellos de forma inteligente. Y lo vamos a hacer de una forma un poco diferente —
@@ -297,8 +297,8 @@
             <h2 style="margin-bottom: 0.2em;">The solution</h2>
             <ul style="margin-top: 0.2em; margin-bottom: 0.3em;">
                 <li class="fragment">A Quarkus integration, but Stork can be used also standalone</li>
-                <li class="fragment">Built-in support for Consul, Kubernetes, Eureka and more.</li>
-                <li class="fragment">Extensible service discovery mechanisms and  client load-balancing strategies</li>
+                <li class="fragment">Built-in support for Consul, Eureka and Round-robin and more.</li>
+                <li class="fragment">Extensible service discovery mechanisms and client load-balancing strategies</li>
                 <li class="fragment">A programmatic API and a managed approach</li>
             </ul>
             <div style="display: flex; justify-content: center;">
@@ -306,10 +306,15 @@
             </div>
             <aside class="notes">
                 Y aquí es donde entra SmallRye Stork. Stork es una framework de service discovery y client-side load balancing para aplicaciones Java.
+                La idea es sencilla: en lugar de que un proxy externo decida a qué instancia va cada petición, es tu propia aplicación la que descubre las
+                instancias disponibles y elige la mejor.
                 Es parte del ecosistema SmallRye y se integra de forma nativa con Quarkus, aunque como veremos hoy, también funciona con Spring Boot.
-                La idea es sencilla: en lugar de que un proxy externo decida a qué instancia va cada petición, es tu propia aplicación la que descubre las instancias disponibles
-                y elige la mejor. Esto te da más control, más flexibilidad y la posibilidad de implementar estrategias de discovery y balanceo personalizadas.
-                Por si alguien no los conoce: Consul y Eureka son service registries — bases de datos distribuidas donde los servicios se registran al arrancar y que permiten a otros servicios descubrirlos por nombre en vez de por IP. Consul es de HashiCorp e incluye además health checking y key-value store. Eureka es de Netflix y está pensado para entornos cloud con alta disponibilidad — es el que usa Spring Cloud internamente.
+                Stork viene con unas cuantas estrategias de base: Consul, Eureka o K8s para SD, y round-robin, random, para LB. Pero si ninguna te encaja, puedes crear la tuya propia.
+                Ofrece un mecanismo para extenderlo por lo que teneis la posibilidad de implementar estrategias de discovery y balanceo personalizadas.
+                Por si alguien no los conoce: Consul y Eureka son service registries donde los servicios se registran al arrancar y que permiten a otros servicios descubrirlos por nombre en vez de por IP.
+
+                Stork ofrece dos formas de usarlo: una API programática, donde tú controlas explícitamente el discovery y la selección. Y un enfoque gestionado, donde el
+                framework se encarga de todo de forma transparente.
             </aside>
         </section>
 
@@ -319,13 +324,8 @@
                 <img src="/images/concepts.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
             </div>
             <aside class="notes">
-                Los dos conceptos clave de Stork son estos. Primero, Service Discovery: el proceso de encontrar las instancias disponibles de un servicio.
-                Stork soporta múltiples proveedores — Consul, Eureka, Kubernetes, o una lista estática.
-                Segundo, Load Balancing: una vez que tenemos la lista de instancias, ¿a cuál le enviamos la petición? Stork incluye varias estrategias: round-robin, random, least-requests, power-of-two-choices, least-response-time y sticky. Y si ninguna te encaja, puedes crear la tuya propia.
-
-                A nivel programático, el proceso para usar Stork es el siguiente: primero obtenemos la instancia singleton de Stork, que viene configurada con un conjunto de servicios que va a gestionar — lo que llamamos definiciones de servicio. A continuación, tomamos el servicio que nos interese por su nombre. Y por último, obtenemos la ServiceInstance, que nos proporciona los datos necesarios — host, puerto, metadata — para acceder al servicio real.
-                Stork propone un API que os permite registrar estas definiciones de servicio y hacer búsqueda y selección de instancias de forma manual.
-                Pero si usáis Stork con un framework como Quarkus, todo este proceso está oculto — el framework se encarga de todo.
+               Básicamente el proceso consiste en obtener una instancia de Stork — es un singleton que viene configurado con un conjunto de servicios que va a gestionar, lo que llamamos definiciones de servicio. A continuación, tomamos el servicio que nos interese — cada servicio lleva asociado un nombre. Y por último, obtenemos la ServiceInstance, que nos proporciona los datos necesarios — host, puerto, metadata — para acceder al servicio real.
+                Stork propone un API que os permite registrar estas definiciones de servicio y hacer búsqueda y selección de instancias de forma manual. Pero si usáis Stork con un framework como Quarkus, todo este proceso está oculto — el framework se encarga de todo.
             </aside>
         </section>
 
@@ -597,7 +597,7 @@ quarkus.stork.band-service.service-discovery.refresh-period=10S
                 <ul>
                     <li class="fragment">Implement <code>LoadBalancer</code> + <code>LoadBalancerProvider</code></li>
                     <li class="fragment">Annotate el provider con <code>@LoadBalancerType("custom-load-balancer")</code></li>
-                    <li class="fragment">Stork lo descubre vía SPI: zero configuración extra</li>
+                    <li class="fragment">Stork discovers via SPI: zero extra configuration</li>
                 </ul>
                 <div class="two-columns fragment" style="margin-top:1em;">
                     <pre><code class="language-java" data-trim>
