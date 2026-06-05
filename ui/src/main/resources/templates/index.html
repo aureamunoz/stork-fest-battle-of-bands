@@ -30,6 +30,14 @@
             padding: 1em;
             max-height: 500px;
         }
+        .reveal pre code table tr:not(.highlight-line) {
+            opacity: 0.3;
+        }
+        .reveal pre code table tr.highlight-line {
+            font-size: 1.1em;
+            text-color: #ffff00;
+            text-shadow: 0 0 8px rgba(238, 230, 0, 0.5);
+        }
         .reveal ul { font-size: 0.85em; }
         .reveal li { margin-bottom: 0.4em; }
         .reveal section { text-align: left; }
@@ -299,6 +307,7 @@
                 <li class="fragment">A Quarkus integration, but Stork can be used also standalone</li>
                 <li class="fragment">Built-in support for Consul, Eureka and Round-robin and more.</li>
                 <li class="fragment">Extensible service discovery mechanisms and client load-balancing strategies</li>
+                <li class="fragment">Service registration — programmatic and automatic</li>
                 <li class="fragment">A programmatic API and a managed approach</li>
             </ul>
             <div style="display: flex; justify-content: center;">
@@ -312,28 +321,47 @@
                 Stork viene con unas cuantas estrategias de base: Consul, Eureka o K8s para SD, y round-robin, random, para LB. Pero si ninguna te encaja, puedes crear la tuya propia.
                 Ofrece un mecanismo para extenderlo por lo que teneis la posibilidad de implementar estrategias de discovery y balanceo personalizadas.
                 Por si alguien no los conoce: Consul y Eureka son service registries donde los servicios se registran al arrancar y que permiten a otros servicios descubrirlos por nombre en vez de por IP.
-
-                Stork ofrece dos formas de usarlo: una API programática, donde tú controlas explícitamente el discovery y la selección. Y un enfoque gestionado, donde el
-                framework se encarga de todo de forma transparente.
+                Además de descubrir y balancear, Stork también permite registrar servicios en el registry. Esto se puede hacer de dos formas: programáticamente, usando la API de Stork para llamar a registerInstance() directamente, o de forma automática, simplemente añadiendo la dependencia y la configuración — al arrancar, el servicio se registra solo. Veremos ambos enfoques en la demo.
+                Stork ofrece dos formas de usarlo: una API programática, donde tú controlas explícitamente el discovery, la selección y el registro. Y un enfoque gestionado, donde el framework se encarga de todo de forma transparente.
             </aside>
         </section>
 
-        <section>
-            <h2>Concepts</h2>
+        <section class="demo-slide">
+            <h2 style="margin-bottom: 0.1em; margin-top: 0;">Programmatic API</h2>
             <div style="display: flex; justify-content: center;">
-                <img src="/images/concepts.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+                <img src="/images/concepts.png" style="max-width: 85%; max-height: 35vh; object-fit: contain;">
             </div>
+            <pre class="fragment" style="font-size: 0.38em; margin: 0.3em auto;"><code class="language-java" data-trim>
+@GetMapping("/dispatch")
+public String dispatch() {
+    Stork stork = Stork.initialize();
+    Service service = stork.getService("band-service");
+    ServiceInstance instance = service.selectInstance()
+            .await().atMost(Duration.ofSeconds(5));
+    String url = String.format("http://%s:%d/", instance.getHost(), instance.getPort());
+    return restTemplate.getForObject(url, String.class);
+}
+            </code></pre>
             <aside class="notes">
                Básicamente el proceso consiste en obtener una instancia de Stork — es un singleton que viene configurado con un conjunto de servicios que va a gestionar, lo que llamamos definiciones de servicio. A continuación, tomamos el servicio que nos interese — cada servicio lleva asociado un nombre. Y por último, obtenemos la ServiceInstance, que nos proporciona los datos necesarios — host, puerto, metadata — para acceder al servicio real.
                 Stork propone un API que os permite registrar estas definiciones de servicio y hacer búsqueda y selección de instancias de forma manual. Pero si usáis Stork con un framework como Quarkus, todo este proceso está oculto — el framework se encarga de todo.
             </aside>
         </section>
 
-        <section>
-            <h2>Managed approach: Stork and Quarkus</h2>
+        <section class="demo-slide">
+            <h2 style="margin-bottom: 0.1em; margin-top: 0;">Managed approach: Stork and Quarkus</h2>
             <div style="display: flex; justify-content: center;">
-                <img src="/images/quarkus-stork.png" style="max-width: 90%; max-height: 65vh; object-fit: contain;">
+                <img src="/images/quarkus-stork.png" style="max-width: 85%; max-height: 35vh; object-fit: contain;">
             </div>
+            <pre class="fragment" style="font-size: 0.38em; margin: 0.3em auto;"><code class="language-java" data-trim>
+@Path("/")
+@RegisterRestClient(baseUri = "stork://band-service")  // ⬅ stork://
+public interface BandClient {
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    String play();
+}
+            </code></pre>
             <aside class="notes">
                 En Quarkus, la integración con Stork es completamente transparente.
                 Usas un REST client normal, pero en lugar de poner una URL fija, pones stork://nombre-del-servicio. Quarkus intercepta esa llamada, usa Stork para descubrir
